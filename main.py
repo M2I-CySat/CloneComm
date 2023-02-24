@@ -10,15 +10,22 @@ def send_packet():
 def req_packet():
     print("Packet Request Button Test")
 
+#Initializes textvariables for dropdown menus
+test_command = "Choose command..."
+obc_command = "Choose command..."
+adcs_command = "Choose command..."
+sdr_command = "Choose command..."
+eps_command = "Choose command..."
+uhf_command = "Choose command..."
+
 #Creates the main application window
 root = Tk()
 root.title("CloneComms")
 mainframe = ttk.Frame(root, padding=5)
-titlelbl = ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont")
+ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0, columnspan=3)
 
 #Organizes widgets inside the main window
 mainframe.grid(row=0, column=0)
-titlelbl.grid(row=0, column=0, columnspan=3)
 
 #Creates tabs for each subsystem
 
@@ -37,12 +44,20 @@ eps_tab = ttk.Frame(tab_interface)
 uhf_tab = ttk.Frame(tab_interface)
 
 tab_interface.add(test_tab, text='Test Commands')
+
+#Creates a dropdown menu for command options
+
+test_combobox = ttk.Combobox(test_tab,textvariable=test_command,values=['Test 1','Test 2'])
+test_combobox.grid(column=1,row=0)
+ttk.Label(test_tab, text="Choose Command:", padding=5).grid(column=0,row=0)
+
 #Button to send packet (for testing)
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet, padding=5)
-send_packet_btn.grid(column=1,row=0)
+send_packet_btn.grid(column=1,row=2)
+
 #Button to request a packet (for testing)
 req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet, padding=5)
-req_packet_btn.grid(column=0,row=0)
+req_packet_btn.grid(column=0,row=2)
 
 tab_interface.add(obc_tab, text='OBC Commands')
 tab_interface.add(adcs_tab, text='ADCS Commands')
