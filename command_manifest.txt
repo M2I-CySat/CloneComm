@@ -2,6 +2,11 @@
 - # marks the beginning of a subtype
 - cmd_id:com_desc:data_payload(1=True,0=False):gs_sendable(1=True,0=False)
 
+#1:TEST
+0:Test 1 Command:1:1
+1:Test 2 Command:1:1
+2:Test 3 Command:1:1
+
 #10:OBC
 0:Ping Response:1:0
 1:Ping Request:0:1
