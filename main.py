@@ -13,7 +13,7 @@ global_module.populate_global_variables()
 
 #Creates the main application window
 root = Tk()
-root.title("CloneComms")
+root.title("CloneComm")
 mainframe = ttk.Frame(root, padding=5)
 ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0, columnspan=3)
 
@@ -53,18 +53,36 @@ for key, value in cmd_list.items():
         dropdown_cmd_list.append(value.cmd_description)
 
 #Creates a dropdown menu for command options
-ttk.Label(test_tab, text="Choose Command:").grid(column=0,row=0,sticky=W)
+ttk.Label(test_tab, text="Choose Command:", padding=3).grid(column=0,row=0,sticky=W)
 test_command = StringVar(test_tab)
 test_combobox = ttk.Combobox(test_tab,textvariable=test_command,values=dropdown_cmd_list,state=(["readonly"]))
 test_combobox.grid(column=2,row=0)
 
-#Creates an input box
-ttk.Label(test_tab, text="Enter Custom Packet:").grid(column=0,row=2)
-test_entry = ttk.Entry(test_tab, textvariable=packet_input).grid(column=1,row=2,columnspan=3, sticky=EW)
+def get_dropdown_selection(event):
+#When the user selects a command in the combobox, looks for ID of selected command in the command manifest
+    for key, value in cmd_list.items():
+        if(value.cmd_description == test_command.get()):
+            value.cmd_id = key
+            #Prints description of command (value selected in combobox)
+            print(value.cmd_description)
+            print(value.cmd_id)
+test_combobox.bind('<<ComboboxSelected>>', get_dropdown_selection)
 
+#Creates an input box
+ttk.Label(test_tab, text="Enter Custom Packet:", padding=3).grid(column=0,row=2)
+test_entry = ttk.Entry(test_tab, textvariable=packet_input).grid(column=1,row=2,columnspan=3, sticky=EW)
 #Function to retrieve input from the entry box
 def get_input():
     print(packet_input.get())
+
+# Check if cmd requires payload or not and enable UI
+
+#DOES NOT WORK YET- DO NOT USE
+#cmd = cmd_list[get_dropdown_selection(0)]
+#if(cmd.cmd_has_payload == 1):
+#    test_entry.configure(state='disabled')
+#else:
+#    test_entry.configure(state='!disabled')
 
 #Button to send packet (for testing)
 send_custom_btn = ttk.Button(test_tab, text="Send Entry", command=get_input)
@@ -72,6 +90,7 @@ send_custom_btn.grid(column=2,row=3,sticky=E)
 
 #If nothing has been entered, disables the "Send Entry" button
 #Updates any time the user changes the text in the entry box
+send_custom_btn.state(['disabled'])
 def set_button_state(var,index,mode):
     if len(packet_input.get()) == 0:
         send_custom_btn.state(['disabled'])
