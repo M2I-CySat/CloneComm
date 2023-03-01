@@ -58,31 +58,33 @@ test_command = StringVar(test_tab)
 test_combobox = ttk.Combobox(test_tab,textvariable=test_command,values=dropdown_cmd_list,state=(["readonly"]))
 test_combobox.grid(column=2,row=0)
 
-def get_dropdown_selection(event):
+#Creates an input box
+ttk.Label(test_tab, text="Enter Custom Packet:", padding=3).grid(column=0,row=2)
+test_entry = ttk.Entry(test_tab, textvariable=packet_input)
+test_entry.grid(column=1,row=2,columnspan=3, sticky=EW)
+
+#Disables input box if a command has not been selected from the dropdown menu
+test_entry.state(['disabled'])
+def set_button_state(var,index,mode):
+    if test_command.get() == 0:
+        test_entry.state(['disabled'])
+    else:
+        test_entry.state(['!disabled'])
+test_command.trace_add("write", set_button_state)
+
 #When the user selects a command in the combobox, looks for ID of selected command in the command manifest
+def get_dropdown_selection():
     for key, value in cmd_list.items():
         if(value.cmd_description == test_command.get()):
             value.cmd_id = key
-            #Prints description of command (value selected in combobox)
-            print(value.cmd_description)
-            print(value.cmd_id)
-test_combobox.bind('<<ComboboxSelected>>', get_dropdown_selection)
-
-#Creates an input box
-ttk.Label(test_tab, text="Enter Custom Packet:", padding=3).grid(column=0,row=2)
-test_entry = ttk.Entry(test_tab, textvariable=packet_input).grid(column=1,row=2,columnspan=3, sticky=EW)
-#Function to retrieve input from the entry box
+            #Returns command id for selected command
+            return value.cmd_id
+        
+#Retrieves data from input box and selection from combobox
 def get_input():
     print(packet_input.get())
-
-# Check if cmd requires payload or not and enable UI
-
-#DOES NOT WORK YET- DO NOT USE
-#cmd = cmd_list[get_dropdown_selection(0)]
-#if(cmd.cmd_has_payload == 1):
-#    test_entry.configure(state='disabled')
-#else:
-#    test_entry.configure(state='!disabled')
+    #Command id from dropdown selection will be used to call a specific command
+    print(get_dropdown_selection())
 
 #Button to send packet (for testing)
 send_custom_btn = ttk.Button(test_tab, text="Send Entry", command=get_input)
@@ -97,6 +99,7 @@ def set_button_state(var,index,mode):
     else:
         send_custom_btn.state(['!disabled'])
 packet_input.trace_add("write", set_button_state)
+
 
 ######################################################################################################################
 #OBC Tab (currently used for testing buttons)
