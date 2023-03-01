@@ -41,11 +41,13 @@ uhf_tab = ttk.Frame(tab_interface,padding=5)
 
 ######################################################################################################################
 #Test Tab (currently in use for testing interface functions, will be removed later)
+#NOTE: All interface elements used in the test tab will be included in each subsystem tab
 
 tab_interface.add(test_tab, text='Test')
 
+#-------------------------------------------------------------------#
+#DROPDOWN COMMAND MENU
 #Populates command list for the selected subsystem (in this case, test (id = 1))
-#Will be used for other subsystems
 cmd_list = cmd_dictionary[1]
 dropdown_cmd_list = []
 for key, value in cmd_list.items():
@@ -58,20 +60,6 @@ test_command = StringVar(test_tab)
 test_combobox = ttk.Combobox(test_tab,textvariable=test_command,values=dropdown_cmd_list,state=(["readonly"]))
 test_combobox.grid(column=2,row=0)
 
-#Creates an input box
-ttk.Label(test_tab, text="Enter Custom Packet:", padding=3).grid(column=0,row=2)
-test_entry = ttk.Entry(test_tab, textvariable=packet_input)
-test_entry.grid(column=1,row=2,columnspan=3, sticky=EW)
-
-#Disables input box if a command has not been selected from the dropdown menu
-test_entry.state(['disabled'])
-def set_button_state(var,index,mode):
-    if test_command.get() == 0:
-        test_entry.state(['disabled'])
-    else:
-        test_entry.state(['!disabled'])
-test_command.trace_add("write", set_button_state)
-
 #When the user selects a command in the combobox, looks for ID of selected command in the command manifest
 def get_dropdown_selection():
     for key, value in cmd_list.items():
@@ -79,25 +67,59 @@ def get_dropdown_selection():
             value.cmd_id = key
             #Returns command id for selected command
             return value.cmd_id
-        
+
+#Checks if selected command (indicated by cmd_id) has a payload
+#Used to enable/disable input box
+def command_has_payload():
+    cmd = cmd_list[get_dropdown_selection()]
+    if cmd.cmd_has_payload == 1:
+        return TRUE
+    else:
+        return FALSE
+
+#-------------------------------------------------------------------#
+#INPUT BOX
+#Creates an input box
+ttk.Label(test_tab, text="Enter Custom Packet:", padding=3).grid(column=0,row=2)
+test_entry = ttk.Entry(test_tab, textvariable=packet_input)
+test_entry.grid(column=1,row=2,columnspan=3, sticky=EW)
+
+#Disables input box if a command has not been selected from the dropdown menu
+#OR disables input box if the command does not have a data payload (NOT YET IMPLEMENTED)
+test_entry.state(['disabled'])
+def set_entry_state(var,index,mode):
+    if test_command.get() == 0 or command_has_payload():
+        test_entry.state(['disabled'])
+    else:
+        test_entry.state(['!disabled'])
+test_command.trace_add("write", set_entry_state)
+      
 #Retrieves data from input box and selection from combobox
 def get_input():
-    print(packet_input.get())
     #Command id from dropdown selection will be used to call a specific command
     print(get_dropdown_selection())
+    print(packet_input.get())
 
+#-------------------------------------------------------------------#
+#SEND ENTRY BUTTON
 #Button to send packet (for testing)
 send_custom_btn = ttk.Button(test_tab, text="Send Entry", command=get_input)
 send_custom_btn.grid(column=2,row=3,sticky=E)
 
-#If nothing has been entered, disables the "Send Entry" button
+#Disables the "Send Entry" button:
+#   If nothing has been entered
+#   If the selected command does not allow the user to enter custom packet data
 #Updates any time the user changes the text in the entry box
 send_custom_btn.state(['disabled'])
 def set_button_state(var,index,mode):
     if len(packet_input.get()) == 0:
-        send_custom_btn.state(['disabled'])
+        if command_has_payload():
+            send_custom_btn.state(['!disabled'])
+        else:
+            send_custom_btn.state(['disabled'])
     else:
         send_custom_btn.state(['!disabled'])
+test_command.trace_add("write", set_button_state)
 packet_input.trace_add("write", set_button_state)
 
 
