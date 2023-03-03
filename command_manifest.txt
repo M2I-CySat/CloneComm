@@ -2,13 +2,14 @@
 - # marks the beginning of a subtype
 - cmd_id:com_desc:data_payload(1=True,0=False):gs_sendable(1=True,0=False)
 
-#1:TEST
+#0:TEST
 0:Test 1 Command:1:1
 1:Test 2 Command:0:1
 2:Test 3 Command:1:1
 3:Test 4 Command:1:0
+4:Set Magnetometer Offset and Scaling Configuration:0:1
 
-#10:OBC
+#1:OBC
 0:Ping Response:1:0
 1:Ping Request:0:1
 2:Disable Beacon Response:1:0
@@ -18,11 +19,11 @@
 6:Main Operating Response:0:0
 7:Main Operating Request:0:1
 
-#30:EPS
+#2:EPS
 0:Voltage Response:1:0
 1:Voltage Request:0:1
 
-#40:SDR
+#3:SDR
 0:Power Status Response:0:0
 1:Power Status Request:0:1
 2:Time Set Response:0:0
