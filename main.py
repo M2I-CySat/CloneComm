@@ -1,6 +1,11 @@
 from tkinter import *
 from tkinter import ttk
 import importlib
+
+from CySatGlobal import Command
+from CySatPacket import Packet
+from CySatPacket import create_packet
+
 #Use struct to send data (packets)?
 
 #Imports CySatGlobal for command information
@@ -10,6 +15,17 @@ sys_dictionary = global_module.sys_dictionary
 sys_list = global_module.sys_list
 
 global_module.populate_global_variables()
+
+#Creates a new Command class which includes system ID
+#Mostly for simulating how a CySat packet will be created (likely to be removed later)
+class TypeCommand:
+    def __init__(self, sys_id, cmd_id):
+        self.sys_id = sys_id
+        self.cmd_id = cmd_id
+
+def create_TypeCommand(sys_id, cmd_id):
+    sending_cmd = TypeCommand(sys_id, cmd_id)
+    return sending_cmd
 
 #Creates the main application window
 root = Tk()
@@ -115,8 +131,9 @@ test_command.trace_add("write", set_entry_state)
 #Retrieves data from input box and selection from combobox
 def get_input():
     #Command id from dropdown selection will be used to call a specific command
-    print(get_dropdown_selection())
-    print(packet_input.get())
+    input = create_TypeCommand(0,get_dropdown_selection())
+    print("System ID: " + str(input.sys_id))
+    print("Command ID: " + str(input.cmd_id))
 
 #-------------------------------------------------------------------#
 #SEND ENTRY BUTTON

@@ -45,8 +45,8 @@ def grab_command_manifest():
                 cmd_dictionary[int(current_id)][int(line_list[0])] = cmd
 
 class Command:
-    def __init__(self, id, desc, has_payload, sendable):
-        self.cmd_id = id
+    def __init__(self, cmd_id, desc, has_payload, sendable):
+        self.cmd_id = cmd_id
         self.cmd_description = desc
         self.cmd_has_payload = has_payload
         self.cmd_sendable = sendable
