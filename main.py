@@ -1,10 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 import importlib
-
-from CySatGlobal import Command
-from CySatPacket import Packet
-from CySatPacket import create_packet
+import serial
+from ADCSTab import adcs_Tab
 
 #Use struct to send data (packets)?
 
@@ -15,17 +13,6 @@ sys_dictionary = global_module.sys_dictionary
 sys_list = global_module.sys_list
 
 global_module.populate_global_variables()
-
-#Creates a new Command class which includes system ID
-#Mostly for simulating how a CySat packet will be created (likely to be removed later)
-class TypeCommand:
-    def __init__(self, sys_id, cmd_id):
-        self.sys_id = sys_id
-        self.cmd_id = cmd_id
-
-def create_TypeCommand(sys_id, cmd_id):
-    sending_cmd = TypeCommand(sys_id, cmd_id)
-    return sending_cmd
 
 #Creates the main application window
 root = Tk()
@@ -49,7 +36,7 @@ tab_interface.grid(row=1,column=1,rowspan=3,sticky=NSEW)
 
 test_tab = ttk.Frame(tab_interface,padding=5)
 obc_tab = ttk.Frame(tab_interface,padding=5)
-adcs_tab = ttk.Frame(tab_interface,padding=5)
+adcs_tab = adcs_Tab(tab_interface)
 sdr_tab = ttk.Frame(tab_interface,padding=5)
 eps_tab = ttk.Frame(tab_interface,padding=5)
 uhf_tab = ttk.Frame(tab_interface,padding=5)
@@ -131,9 +118,7 @@ test_command.trace_add("write", set_entry_state)
 #Retrieves data from input box and selection from combobox
 def get_input():
     #Command id from dropdown selection will be used to call a specific command
-    input = create_TypeCommand(0,get_dropdown_selection())
-    print("System ID: " + str(input.sys_id))
-    print("Command ID: " + str(input.cmd_id))
+    print("Test")
 
 #-------------------------------------------------------------------#
 #SEND ENTRY BUTTON
@@ -167,28 +152,23 @@ def send_packet():
     print("Packet Send Button Test")
 
 def req_packet():
-    print("Packet Request Button Test")
+    #Create serial port object
+
+    uart = serial.Serial("COM3", 9600, timeout=1)
+    line = uart.readline()
+    print("Beacon Text:")
+    print(line)
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(obc_tab, text="Send Packet", command=send_packet, padding=5).grid(column=0,row=0)
-req_packet_btn = ttk.Button(obc_tab, text="Request Packet", command=req_packet, padding=5).grid(column=1,row=0)
-
+req_packet_btn = ttk.Button(obc_tab, text="Request Packet", command=req_packet, padding=5)
+req_packet_btn.grid(column=1,row=0)
+req_packet_btn.state(['disabled']) #Remove when ready for testing
 
 ######################################################################################################################
 #ADCS Tab
 
-#ADCS command list population
-adcs_dropdown = get_dropdown_list(2)
-adcs_cmd_list = get_cmd_list(2)
-
-#-------------------------------------------------------------------#
-#DROPDOWN COMMAND MENU
-#Creates a dropdown menu for command options
-#Uses command list for the selected subsystem
-ttk.Label(adcs_tab, text="Choose Command:", padding=3).grid(column=0,row=0,sticky=W)
-adcs_command = StringVar(adcs_tab)
-adcs_combobox = ttk.Combobox(adcs_tab,textvariable=adcs_command,values=adcs_dropdown,state=(["readonly"]))
-adcs_combobox.grid(column=2,row=0)
+#Currently working on separate tab module
 
 
 ######################################################################################################################
