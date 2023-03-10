@@ -94,12 +94,12 @@ class obc_Tab(ttk.Frame):
             obc_entry.delete(0,END)
 
         #-------------------------------------------------------------------#
-        #SEND ENTRY BUTTON
-        #Button to send packet (for testing)
-        send_custom_btn = ttk.Button(self, text="Send Entry", command=get_obc_input)
+        #SEND COMMAND BUTTON
+        #Button to send packet
+        send_custom_btn = ttk.Button(self, text="Send Command", command=get_obc_input)
         send_custom_btn.grid(column=2,row=3,sticky=E)
 
-        #Disables the "Send Entry" button:
+        #Disables the "Send Command" button:
         #   If nothing has been entered
         #   If the selected command does not allow the user to enter custom packet data
         #Updates any time the user changes the text in the entry box
