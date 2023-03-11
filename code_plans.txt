@@ -1,0 +1,8 @@
+Checklist for future CloneComm development
+
+* Add all command functionality!
+
+* Add separate frame within interface to connect/disconnect from UART
+* Add test button, gray out "Send Command" button if serial/UART connection is not established
+    -Test button will be used to print information to the terminal in the absence of UART
+* Add console to interface (Logger)?

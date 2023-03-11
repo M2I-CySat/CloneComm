@@ -24,13 +24,6 @@ root.title("CloneComm")
 mainframe = ttk.Frame(root, padding=5)
 ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0, columnspan=3)
 
-#Initializes textvariables for dropdown menus
-obc_command = StringVar()
-sdr_command = StringVar()
-eps_command = StringVar()
-uhf_command = StringVar()
-packet_input = StringVar()
-
 #Organizes widgets inside the main window
 mainframe.grid(row=0, column=0)
 
