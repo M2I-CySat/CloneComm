@@ -62,12 +62,28 @@ def get_cmd_list(tab_index):
     cmd_list = cmd_dictionary[tab_index]
     return(cmd_list)
 
+
+#Creates a terminal window on the side of the main window which displays the output of the program
+log = Text(root, state='disabled', width=40, height=24, wrap='none')
+log.grid(row=1, column=1, rowspan=3, sticky=NSEW) # sticky=NSEW allows the text box to expand with the window
+
+def writeToLog(msg):
+    numlines = int(log.index('end - 1 line').split('.')[0])
+    log['state'] = 'normal'
+    if numlines==24:
+        log.delete(1.0, 2.0)
+    if log.index('end-1c')!='1.0':
+        log.insert('end', '\n')
+    log.insert('end', msg)
+    log['state'] = 'disabled'
+
 ######################################################################################################################
 #Test Tab
 
 #Commands for basic packet-sending testing
 def send_packet():
     print("Packet Send Button Test")
+    writeToLog("Packet Send Button Test")
 
 def req_packet():
     #Create serial port object
@@ -76,6 +92,7 @@ def req_packet():
     line = uart.readline()
     print("Beacon Text:")
     print(line)
+    writeToLog("Beacon Text: " + line)
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet, padding=5).grid(column=0,row=0)
