@@ -45,6 +45,7 @@ tab_interface.add(sdr_tab, text='  SDR  ')
 tab_interface.add(eps_tab, text='  EPS  ')
 tab_interface.add(uhf_tab, text='  UHF  ')
 
+
 ###
 #NOTE: These commands were for when other tabs were included in the same file
 
@@ -65,23 +66,35 @@ def get_cmd_list(tab_index):
 ######################################################################################################################
 #Test Tab
 
+ttk.Label(test_tab,text="Port:").grid(column=0,row=0,sticky=W,pady=10)
+port_entry = ttk.Entry(test_tab)
+port_entry.grid(column=1,row=0)
+ttk.Label(test_tab,text="Baud Rate:").grid(column=0,row=1,sticky=W)
+baud_entry = ttk.Entry(test_tab)
+baud_entry.grid(column=1,row=1)
+
+
 #Commands for basic packet-sending testing
 def send_packet():
     print("Packet Send Button Test")
+    print(port_entry.get())
 
 def req_packet():
     #Create serial port object
 
-    uart = serial.Serial("COM3", 9600, timeout=1)
+    uart = serial.Serial("COM5", 9600, timeout=10)
+    uart.open()
     line = uart.readline()
     print("Beacon Text:")
     print(line)
+    uart.close()
 
 #Adds buttons to interface
-send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet, padding=5).grid(column=0,row=0)
-req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet, padding=5)
-req_packet_btn.grid(column=1,row=0)
-req_packet_btn.state(['disabled']) #Remove when ready for testing
+send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
+send_packet_btn.grid(column=0,row=2,pady=10)
+req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet)
+req_packet_btn.grid(column=1,row=2,pady=10)
+#req_packet_btn.state(['disabled']) #Remove when ready for testing
 
 ######################################################################################################################
 #All other tabs contained within separate modules
