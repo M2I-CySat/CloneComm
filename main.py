@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import importlib
 import serial
+import time
 from ADCSTab import adcs_Tab
 from SDRTab import sdr_Tab
 from EPSTab import eps_Tab
@@ -97,18 +98,26 @@ def send_packet():
 
 def req_packet():
     #Create serial port object
+    uart = serial.Serial("COM5", 9600, timeout=60)
 
-    uart = serial.Serial("COM5", 9600, timeout=10)
-    line = uart.readline()
-    print("Beacon Text:")
-    print(line)
+    start_time = time.time()
+    elapsed_time = time.time() - start_time
+
+    #Read from the port for 60 seconds
+    while elapsed_time <= 60:
+        
+        line = uart.readline()
+        print("Beacon Text:")
+        print(line)
+        elapsed_time = time.time() - start_time
+
     uart.close()
-    writeToLog("Beacon Text: " + line)
+    # writeToLog("Beacon Text: " + line) Fatal error when input is byte not string
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
 send_packet_btn.grid(column=0,row=2,pady=10)
-req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet)
+req_packet_btn = ttk.Button(test_tab, text="Read Data", command=req_packet)
 req_packet_btn.grid(column=1,row=2,pady=10)
 #req_packet_btn.state(['disabled']) #Remove when ready for testing
 
