@@ -19,6 +19,9 @@ sys_list = global_module.sys_list
 
 global_module.populate_global_variables()
 
+uart = NONE
+test_mode = FALSE
+
 #Creates the main application window
 root = Tk()
 root.title("CloneComm")
@@ -45,8 +48,92 @@ tab_interface.add(sdr_tab, text='  SDR  ')
 tab_interface.add(eps_tab, text='  EPS  ')
 tab_interface.add(uhf_tab, text='  UHF  ')
 
+######################################################################################################################
+#UART interface for connecting and disconnecting
 
-###
+UART_frame = ttk.Frame(mainframe, padding=5)
+UART_frame.grid(row=2,column=0)
+ttk.Label(UART_frame, text="Connect to UART").grid(row=1,column=0,columnspan=2)
+
+#Creates a check box to enable/disable test mode
+def change_mode():
+    global test_mode
+
+    if test_mode_switcher.get() == 1:
+        test_mode = TRUE
+    else:
+        test_mode = FALSE
+
+test_mode_switcher = IntVar()
+test_Mode = ttk.Checkbutton(UART_frame, text='Test Mode', variable=test_mode_switcher, onvalue=1, offvalue=0, command=change_mode)
+test_Mode.grid(column=3,row=0,sticky=E)
+
+#Creates entry boxes for UART port and baud rate
+ttk.Label(UART_frame,text="Port:").grid(column=0,row=2,sticky=W,pady=10)
+port_entry = ttk.Entry(UART_frame)
+port_entry.grid(column=1,row=2)
+ttk.Label(UART_frame,text="Baud Rate:").grid(column=0,row=3,sticky=W)
+baud_entry = ttk.Entry(UART_frame)
+baud_entry.grid(column=1,row=3)
+
+# UART Port initialization
+def uart_init():  
+    global uart
+    global test_mode
+
+    print(test_mode)
+    port = "COM" + port_entry.get()
+    baud = baud_entry.get()
+
+    try:
+        uart = serial.Serial(port, baud, timeout=1)
+    except:
+        print("No UART Port Connected")
+        if test_mode:
+            port_entry.config(state='disabled')
+            baud_entry.config(state='disabled')
+            connect_to_UART.config(state='disabled')
+            disconnect_UART.config(state='!disabled')
+        return
+        
+    #If UART connects successfully (or test mode is enabled), disables port and baud rate entry boxes
+    if uart.is_open:
+        print("UART Port Open")
+        port_entry.config(state='disabled')
+        baud_entry.config(state='disabled')
+        connect_to_UART.config(state='disabled')
+        disconnect_UART.config(state='!disabled')
+        # Start reader thread
+        # reader_thread = uart_module.uart_reader(uart, logger)
+        # reader_thread = reader_thread
+        # print("UART Read Thread Started")
+        # reader_thread.start()
+    else:
+        print("UART Error! (Port probably not configured properly)")
+
+def uart_close():
+    global uart
+    try:
+        uart.close()
+        print("UART Closed")
+    except:
+        print("UART Not Open")
+    
+    #Re-enables entry boxes and UART connect button, disables UART disconnect button
+    port_entry.config(state='!disabled')
+    baud_entry.config(state='!disabled')
+    connect_to_UART.config(state='!disabled')
+    disconnect_UART.config(state='disabled')
+
+
+
+connect_to_UART = ttk.Button(UART_frame, text="Connect", command=uart_init)
+connect_to_UART.grid(column=0,row=4,pady=10,sticky=W)
+
+disconnect_UART = ttk.Button(UART_frame, text="Disconnect", command=uart_close, state='disabled')
+disconnect_UART.grid(column=1,row=4,pady=10,sticky=E)
+
+######################################################################################################################
 #NOTE: These commands were for when other tabs were included in the same file
 
 #Populates dropdown list (combobox option names) for the selected subsystem
@@ -67,7 +154,7 @@ def get_cmd_list(tab_index):
 #Creates a terminal window on the side of the main window which displays the output of the program
 ttk.Label(mainframe, text="Command Log",padding=3).grid(row=0, column=1)
 log = Text(mainframe, state='disabled', width=40, height=24, wrap='none')
-log.grid(row=1, column=1, sticky=NSEW)
+log.grid(row=1, column=1, rowspan=2, sticky=NSEW)
 
 #Prints a message in the logging (terminal) window
 def writeToLog(msg):
@@ -83,14 +170,6 @@ def writeToLog(msg):
 ######################################################################################################################
 #Test Tab
 
-ttk.Label(test_tab,text="Port:").grid(column=0,row=0,sticky=W,pady=10)
-port_entry = ttk.Entry(test_tab)
-port_entry.grid(column=1,row=0)
-ttk.Label(test_tab,text="Baud Rate:").grid(column=0,row=1,sticky=W)
-baud_entry = ttk.Entry(test_tab)
-baud_entry.grid(column=1,row=1)
-
-
 #Commands for basic packet-sending testing
 def send_packet():
     print("Packet Send Button Test")
@@ -98,24 +177,22 @@ def send_packet():
     writeToLog("Packet Send Button Test")
 
 def req_packet():
-    #Create serial port object
-    uart = serial.Serial("COM5", 9600, timeout=60)
-
-    start_time = time.time()
-    elapsed_time = time.time() - start_time
-
-    #Read from the port for 60 seconds
-    while elapsed_time <= 60:
-        
-        byte_line = uart.read_until()
-        line = str(byte_line, 'utf-8')
-        print("Beacon Text:")
-        print(line)
+    global uart
+    if uart.is_open:
+        start_time = time.time()
         elapsed_time = time.time() - start_time
 
-        writeToLog("Beacon Text: " + line) #Previously: Fatal error when input is byte not string
+        #Read from the port for 60 seconds
+        while elapsed_time <= 60:
+            
+            byte_line = uart.read_until()
+            line = str(byte_line, 'utf-8')
+            print("Beacon Text:")
+            print(line)
+            elapsed_time = time.time() - start_time
 
-    uart.close()
+            #writeToLog("Beacon Text: " + line) #Previously: Fatal error when input is byte not string
+
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
