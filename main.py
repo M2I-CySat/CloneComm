@@ -53,7 +53,8 @@ tab_interface.add(uhf_tab, text='  UHF  ')
 
 UART_frame = ttk.Frame(mainframe, padding=5)
 UART_frame.grid(row=2,column=0)
-ttk.Label(UART_frame, text="Connect to UART").grid(row=1,column=0,columnspan=2)
+UART_label = ttk.Label(UART_frame, text="Connect to UART")
+UART_label.grid(row=1,column=0,columnspan=2)
 
 #Creates a check box to enable/disable test mode
 def change_mode():
@@ -69,11 +70,15 @@ test_Mode = ttk.Checkbutton(UART_frame, text='Test Mode', variable=test_mode_swi
 test_Mode.grid(column=3,row=0,sticky=E)
 
 #Creates entry boxes for UART port and baud rate
+#Sets default port and baud rate values
+port_entrytxt = StringVar(UART_frame, value="5")
+baud_entrytxt = StringVar(UART_frame, value="9600")
+
 ttk.Label(UART_frame,text="Port:").grid(column=0,row=2,sticky=W,pady=10)
-port_entry = ttk.Entry(UART_frame)
+port_entry = ttk.Entry(UART_frame,textvariable=port_entrytxt)
 port_entry.grid(column=1,row=2)
 ttk.Label(UART_frame,text="Baud Rate:").grid(column=0,row=3,sticky=W)
-baud_entry = ttk.Entry(UART_frame)
+baud_entry = ttk.Entry(UART_frame,textvariable=baud_entrytxt)
 baud_entry.grid(column=1,row=3)
 
 # UART Port initialization
@@ -81,24 +86,26 @@ def uart_init():
     global uart
     global test_mode
 
-    print(test_mode)
     port = "COM" + port_entry.get()
     baud = baud_entry.get()
 
     try:
-        uart = serial.Serial(port, baud, timeout=1)
+        uart = serial.Serial(port, baud, timeout=10)
     except:
         print("No UART Port Connected")
+        writeToLog("UART Connect- Failed")
         if test_mode:
             port_entry.config(state='disabled')
             baud_entry.config(state='disabled')
             connect_to_UART.config(state='disabled')
             disconnect_UART.config(state='!disabled')
+            UART_label.config(text='UART Connected')
         return
         
     #If UART connects successfully (or test mode is enabled), disables port and baud rate entry boxes
     if uart.is_open:
         print("UART Port Open")
+        writeToLog("UART Connect- Success")
         port_entry.config(state='disabled')
         baud_entry.config(state='disabled')
         connect_to_UART.config(state='disabled')
@@ -110,9 +117,11 @@ def uart_init():
         # reader_thread.start()
     else:
         print("UART Error! (Port probably not configured properly)")
+        writeToLog("UART Connect- Error")
 
 def uart_close():
     global uart
+    writeToLog("UART Disconnect")
     try:
         uart.close()
         print("UART Closed")
@@ -124,8 +133,7 @@ def uart_close():
     baud_entry.config(state='!disabled')
     connect_to_UART.config(state='!disabled')
     disconnect_UART.config(state='disabled')
-
-
+    UART_label.config(text='UART Not Connected')
 
 connect_to_UART = ttk.Button(UART_frame, text="Connect", command=uart_init)
 connect_to_UART.grid(column=0,row=4,pady=10,sticky=W)
@@ -172,32 +180,35 @@ def writeToLog(msg):
 
 #Commands for basic packet-sending testing
 def send_packet():
-    print("Packet Send Button Test")
+    print("Send Packet (Currently nonfunctional)")
     print(port_entry.get())
-    writeToLog("Packet Send Button Test")
+    writeToLog("Send Packet")
 
 def req_packet():
     global uart
-    if uart.is_open:
-        start_time = time.time()
+
+    writeToLog("Request Packet")
+    if uart == NONE:
+        print("UART Not Connected- Connect UART First")
+        return
+    
+    start_time = time.time()
+    elapsed_time = time.time() - start_time
+
+    #Read from the port for 60 seconds
+    while elapsed_time <= 30:
+        byte_line = uart.read_until()
+        line = str(byte_line, 'utf-8')
+        print("Beacon Text:")
+        print(line)
+        writeToLog(line)
         elapsed_time = time.time() - start_time
-
-        #Read from the port for 60 seconds
-        while elapsed_time <= 60:
-            
-            byte_line = uart.read_until()
-            line = str(byte_line, 'utf-8')
-            print("Beacon Text:")
-            print(line)
-            elapsed_time = time.time() - start_time
-
-            #writeToLog("Beacon Text: " + line) #Previously: Fatal error when input is byte not string
 
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
 send_packet_btn.grid(column=0,row=2,pady=10)
-req_packet_btn = ttk.Button(test_tab, text="Get Beacon Text", command=req_packet)
+req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet)
 req_packet_btn.grid(column=1,row=2,pady=10)
 #req_packet_btn.state(['disabled']) #Remove when ready for testing
 
