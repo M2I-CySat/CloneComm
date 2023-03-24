@@ -23,14 +23,13 @@ global_module.populate_global_variables()
 root = Tk()
 root.title("CloneComm")
 mainframe = ttk.Frame(root, padding=5)
-ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0, columnspan=3)
-
-#Organizes widgets inside the main window
 mainframe.grid(row=0, column=0)
 
+ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0)
+
 #Creates tabs for each subsystem
-tab_interface = ttk.Notebook(mainframe, padding=5)
-tab_interface.grid(row=1,column=1,rowspan=3,sticky=NSEW)
+tab_interface = ttk.Notebook(mainframe, padding=3)
+tab_interface.grid(row=1,column=0,sticky=NSEW)
 
 test_tab = ttk.Frame(tab_interface,padding=5)
 obc_tab = obc_Tab(tab_interface)
@@ -66,9 +65,11 @@ def get_cmd_list(tab_index):
 
 
 #Creates a terminal window on the side of the main window which displays the output of the program
-log = Text(root, state='disabled', width=40, height=24, wrap='none')
-log.grid(row=1, column=1, rowspan=3, sticky=NSEW) # sticky=NSEW allows the text box to expand with the window
+ttk.Label(mainframe, text="Command Log",padding=3).grid(row=0, column=1)
+log = Text(mainframe, state='disabled', width=40, height=24, wrap='none')
+log.grid(row=1, column=1, sticky=NSEW)
 
+#Prints a message in the logging (terminal) window
 def writeToLog(msg):
     numlines = int(log.index('end - 1 line').split('.')[0])
     log['state'] = 'normal'
@@ -106,18 +107,20 @@ def req_packet():
     #Read from the port for 60 seconds
     while elapsed_time <= 60:
         
-        line = uart.readline()
+        byte_line = uart.read_until()
+        line = str(byte_line, 'utf-8')
         print("Beacon Text:")
         print(line)
         elapsed_time = time.time() - start_time
 
+        writeToLog("Beacon Text: " + line) #Previously: Fatal error when input is byte not string
+
     uart.close()
-    # writeToLog("Beacon Text: " + line) Fatal error when input is byte not string
 
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
 send_packet_btn.grid(column=0,row=2,pady=10)
-req_packet_btn = ttk.Button(test_tab, text="Read Data", command=req_packet)
+req_packet_btn = ttk.Button(test_tab, text="Get Beacon Text", command=req_packet)
 req_packet_btn.grid(column=1,row=2,pady=10)
 #req_packet_btn.state(['disabled']) #Remove when ready for testing
 
