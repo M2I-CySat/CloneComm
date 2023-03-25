@@ -3,33 +3,19 @@ import logging
 import struct
 
 # The standard form of a CySat Packet
-class Packet:
-    def __init__(self):
-        self.sop = 0x0
-        self.type = 0x0
-        self.cmd = 0x0
-        self.length = 0x0
-        self.data = ""
-        self.cs = 0x0
-
 # Params:
 #   sys_id : target subsystem
 #   cmd_id : subsystem specific command
 #   payload_bytearray : payload in byte array format
-# Returns:
-#   Completed, formatted CySat Packet
-def create_packet(sys_id, cmd_id, payload_bytearray):
-    # Create new packet object
-    sending_packet = Packet()
 
-    # Fill in packet attributes
-    sending_packet.sop = 0xFF
-    sending_packet.type = sys_id
-    sending_packet.cmd = cmd_id
-    sending_packet.length = len(payload_bytearray)
-    sending_packet.data = payload_bytearray
-    sending_packet.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
-    return sending_packet
+class Packet:
+    def __init__(self, sys_id, cmd_id, payload_bytearray=None):
+        self.sop = 0xFF
+        self.type = sys_id
+        self.cmd = cmd_id
+        self.length = len(payload_bytearray)
+        self.data = payload_bytearray
+        self.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
 
 # Params:
 #   sys_id : target subsystem

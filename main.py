@@ -56,7 +56,9 @@ UART_frame.grid(row=2,column=0)
 UART_label = ttk.Label(UART_frame, text="Connect to UART")
 UART_label.grid(row=1,column=0,columnspan=2)
 
+#TEST MODE
 #Creates a check box to enable/disable test mode
+#Test mode will be used to test interface functions if no UART connection is present
 def change_mode():
     global test_mode
 
@@ -174,6 +176,7 @@ def writeToLog(msg):
         log.insert('end', '\n')
     log.insert('end', msg)
     log['state'] = 'disabled'
+
 
 ######################################################################################################################
 #Test Tab
