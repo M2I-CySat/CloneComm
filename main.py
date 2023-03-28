@@ -3,11 +3,7 @@ from tkinter import ttk
 import importlib
 import serial
 import time
-from ADCSTab import adcs_Tab
-from SDRTab import sdr_Tab
-from EPSTab import eps_Tab
-from OBCTab import obc_Tab
-from UHFTab import uhf_Tab
+from InterfaceTab import InterfaceTab
 
 #Use struct to send data (packets)?
 
@@ -35,11 +31,11 @@ tab_interface = ttk.Notebook(mainframe, padding=3)
 tab_interface.grid(row=1,column=0,sticky=NSEW)
 
 test_tab = ttk.Frame(tab_interface,padding=5)
-obc_tab = obc_Tab(tab_interface)
-adcs_tab = adcs_Tab(tab_interface)
-sdr_tab = sdr_Tab(tab_interface)
-eps_tab = eps_Tab(tab_interface)
-uhf_tab = uhf_Tab(tab_interface)
+obc_tab = InterfaceTab(tab_interface,"OBC",1)
+adcs_tab = InterfaceTab(tab_interface,"ADCS",2)
+sdr_tab = InterfaceTab(tab_interface,"SDR",3)
+eps_tab = InterfaceTab(tab_interface,"EPS",4)
+uhf_tab = InterfaceTab(tab_interface,"UHF",5)
 
 tab_interface.add(test_tab, text='Test')
 tab_interface.add(obc_tab, text='  OBC  ')
@@ -135,7 +131,7 @@ def uart_close():
     baud_entry.config(state='!disabled')
     connect_to_UART.config(state='!disabled')
     disconnect_UART.config(state='disabled')
-    UART_label.config(text='UART Not Connected')
+    UART_label.config(text='Connect to UART')
 
 connect_to_UART = ttk.Button(UART_frame, text="Connect", command=uart_init)
 connect_to_UART.grid(column=0,row=4,pady=10,sticky=W)
