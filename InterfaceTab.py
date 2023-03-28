@@ -3,6 +3,7 @@ from tkinter import ttk
 import importlib
 from TypeCommand import TypeCommand
 from TypeCommand import create_TypeCommand
+from CySatPacket import *
 
 #Imports commands from CySatGlobal
 global_module = importlib.import_module('CySatGlobal')
@@ -87,13 +88,31 @@ class InterfaceTab(ttk.Frame):
 
         #Retrieves data from input box and selection from combobox
         def get_input():
-            #Command id from dropdown selection will be used to call a specific command
+
             input = create_TypeCommand(2,get_dropdown_selection())
             print("System ID: " + str(input.sys_id))
             print("Command ID: " + str(input.cmd_id))
 
             #Erases input
             input_box.delete(0,END)
+
+            #Specifies sending packet information based on selected subsystem and command
+            #Adds data from input box to end of packet (if applicable)
+            
+                # NOTE: Current error (check CySatPacket)-
+                # File "c:\Users\Owner\OneDrive\Documents\GitHub\CloneComms\CySatPacket.py", line 27, in __init__
+                #     self.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
+                # File "c:\Users\Owner\OneDrive\Documents\GitHub\CloneComms\CySatPacket.py", line 37, in calculate_checksum
+                #     byte_sum = sys_id + cmd_id
+                # TypeError: can only concatenate str (not "int") to str
+
+            # payload = bytearray(packet_input.get(),'utf-8')
+            # Psys_id = hex(get_dropdown_selection())
+            # Pcmd_id = subsystems_dict[subsystem_name]
+
+            # sending_packet = Packet(Psys_id,Pcmd_id,payload)
+
+            # return(sending_packet)
 
         #-------------------------------------------------------------------#
         #SEND COMMAND BUTTON

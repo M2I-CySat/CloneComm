@@ -3,13 +3,6 @@ cmd_dictionary = {}
 sys_dictionary = {}
 sys_list = []
 
-# Global Packet Variables
-OBC = 0x0A
-ADCS = 0x14
-EPS = 0x1E
-SDR = 0x28
-EOL = 0x5A
-
 # Beacon constant
 BEACON = "cysat>W0ISU:Hello, Earth! I am ISU's CySat-I"
 

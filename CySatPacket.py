@@ -2,6 +2,15 @@ import binascii
 import logging
 import struct
 
+# Global Packet Variables
+subsystems_dict = {
+    "OBC": 0x0A,
+    "ADCS": 0x14,
+    "EPS": 0x1E,
+    "SDR": 0x28,
+    "EOL": 0x5A
+}
+
 # The standard form of a CySat Packet
 # Params:
 #   sys_id : target subsystem

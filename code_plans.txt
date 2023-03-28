@@ -7,11 +7,4 @@ Checklist for future CloneComm development
     -Test mode will be used to print information to the terminal in the absence of UART
 * Print beacon messages to console
 
-Implementing packets:
-* Create single class for subsystem tab (all subsystem tabs are instances of the same class) 
-    -Add a property "subsystem_id" to the class, the subsystem id for a tab will be used in sending commands from that tab
-    -NOTE: Creating a single class for all subsystem tabs may be a bad idea if certain tabs need additional features
-* Otherwise, use current tab layout, assign a subsystem id in each file that will be used in command sending
-* OBC tab will be used for initial testing
-
 
