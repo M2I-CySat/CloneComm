@@ -35,14 +35,13 @@ obc_tab = InterfaceTab(tab_interface,"OBC",1)
 adcs_tab = InterfaceTab(tab_interface,"ADCS",2)
 sdr_tab = InterfaceTab(tab_interface,"SDR",3)
 eps_tab = InterfaceTab(tab_interface,"EPS",4)
-uhf_tab = InterfaceTab(tab_interface,"UHF",5)
 
 tab_interface.add(test_tab, text='Test')
 tab_interface.add(obc_tab, text='  OBC  ')
 tab_interface.add(adcs_tab, text='  ADCS  ')
 tab_interface.add(sdr_tab, text='  SDR  ')
 tab_interface.add(eps_tab, text='  EPS  ')
-tab_interface.add(uhf_tab, text='  UHF  ')
+
 
 ######################################################################################################################
 #UART interface for connecting and disconnecting
@@ -139,8 +138,10 @@ connect_to_UART.grid(column=0,row=4,pady=10,sticky=W)
 disconnect_UART = ttk.Button(UART_frame, text="Disconnect", command=uart_close, state='disabled')
 disconnect_UART.grid(column=1,row=4,pady=10,sticky=E)
 
+
 ######################################################################################################################
 #NOTE: These commands were for when other tabs were included in the same file
+#These can be removed when the test tab is no longer needed
 
 #Populates dropdown list (combobox option names) for the selected subsystem
 def get_dropdown_list(tab_index):
@@ -203,15 +204,12 @@ def req_packet():
         writeToLog(line)
         elapsed_time = time.time() - start_time
 
-
 #Adds buttons to interface
 send_packet_btn = ttk.Button(test_tab, text="Send Packet", command=send_packet)
 send_packet_btn.grid(column=0,row=2,pady=10)
 req_packet_btn = ttk.Button(test_tab, text="Request Packet", command=req_packet)
 req_packet_btn.grid(column=1,row=2,pady=10)
-#req_packet_btn.state(['disabled']) #Remove when ready for testing
 
-######################################################################################################################
-#All other tabs contained within separate modules
 
+###
 root.mainloop()

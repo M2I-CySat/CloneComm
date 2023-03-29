@@ -63,7 +63,7 @@ class InterfaceTab(ttk.Frame):
         #Used to enable/disable input box
         def command_has_payload():
             cmd = cmd_list[get_dropdown_selection()]
-            if cmd.cmd_has_payload == 1:
+            if cmd.cmd_has_payload:
                 return TRUE
             else:
                 return FALSE
@@ -79,7 +79,7 @@ class InterfaceTab(ttk.Frame):
         #OR disables input box if the command does not have a data payload
         input_box.state(['disabled'])
         def set_entry_state(var,index,mode):
-            if command.get() == 0 or command_has_payload():
+            if command.get() == 0 or not command_has_payload():
                 input_box.delete(0,END)
                 input_box.state(['disabled'])
             else:
@@ -98,21 +98,15 @@ class InterfaceTab(ttk.Frame):
 
             #Specifies sending packet information based on selected subsystem and command
             #Adds data from input box to end of packet (if applicable)
-            
-                # NOTE: Current error (check CySatPacket)-
-                # File "c:\Users\Owner\OneDrive\Documents\GitHub\CloneComms\CySatPacket.py", line 27, in __init__
-                #     self.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
-                # File "c:\Users\Owner\OneDrive\Documents\GitHub\CloneComms\CySatPacket.py", line 37, in calculate_checksum
-                #     byte_sum = sys_id + cmd_id
-                # TypeError: can only concatenate str (not "int") to str
 
-            # payload = bytearray(packet_input.get(),'utf-8')
-            # Psys_id = hex(get_dropdown_selection())
-            # Pcmd_id = subsystems_dict[subsystem_name]
+            payload = bytearray(packet_input.get(),'utf-8')
+            Psys_id = get_dropdown_selection()
+            Pcmd_id = subsystems_dict[subsystem_name]
 
-            # sending_packet = Packet(Psys_id,Pcmd_id,payload)
+            sending_packet = Packet(Psys_id,Pcmd_id,payload)
 
-            # return(sending_packet)
+            print("Packet Data: " + sending_packet.data)
+            return(sending_packet)
 
         #-------------------------------------------------------------------#
         #SEND COMMAND BUTTON
@@ -127,7 +121,7 @@ class InterfaceTab(ttk.Frame):
         send_custom_btn.state(['disabled'])
         def set_button_state(var,index,mode):
             if len(packet_input.get()) == 0:
-                if command_has_payload():
+                if not command_has_payload():
                     send_custom_btn.state(['!disabled'])
                 else:
                     send_custom_btn.state(['disabled'])

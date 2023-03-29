@@ -22,9 +22,16 @@ class Packet:
         self.sop = 0xFF
         self.type = sys_id
         self.cmd = cmd_id
-        self.length = len(payload_bytearray)
-        self.data = payload_bytearray
-        self.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
+
+        #Prevents a possible error if payload_bytearray=None
+        if payload_bytearray:
+            self.length = len(payload_bytearray)
+            self.data = payload_bytearray
+            self.cs = calculate_checksum(sys_id, cmd_id, payload_bytearray)
+        else:
+            self.length = 0
+            self.data = None
+            self.cs = None
 
 # Params:
 #   sys_id : target subsystem
