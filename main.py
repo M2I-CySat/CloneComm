@@ -4,6 +4,8 @@ import importlib
 import serial
 import time
 from InterfaceTab import InterfaceTab
+from CySatLog import CySatLog
+from UARTConnect import UARTConnect
 
 #Use struct to send data (packets)?
 
@@ -24,119 +26,47 @@ root.title("CloneComm")
 mainframe = ttk.Frame(root, padding=5)
 mainframe.grid(row=0, column=0)
 
-ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont").grid(row=0, column=0)
 
+######################################################################################################################
+#Creates a logging window
+
+log_label = ttk.Label(mainframe, text="Command Log",padding=3)
+log_label.grid(row=2, column=0, columnspan=2)
+
+logger = CySatLog(mainframe, state='disabled', wrap='none')
+logger.grid(row=3, column=0, columnspan=3, sticky=NSEW)
+
+
+######################################################################################################################
+#UART interface for connecting and disconnecting
+
+UART_label = ttk.Label(mainframe, text="Connect to UART")
+UART_label.grid(row=0,column=1)
+
+UART_frame = UARTConnect(mainframe, logger)
+UART_frame.grid(row=1,column=1,padx=10,sticky=S)
+
+
+######################################################################################################################
 #Creates tabs for each subsystem
+
+notebook_label = ttk.Label(mainframe, text="CySat Commands", font="TkHeadingFont")
+notebook_label.grid(row=0, column=0, padx=10)
+
 tab_interface = ttk.Notebook(mainframe, padding=3)
 tab_interface.grid(row=1,column=0,sticky=NSEW)
 
 test_tab = ttk.Frame(tab_interface,padding=5)
-obc_tab = InterfaceTab(tab_interface,"OBC",1)
-adcs_tab = InterfaceTab(tab_interface,"ADCS",2)
-sdr_tab = InterfaceTab(tab_interface,"SDR",3)
-eps_tab = InterfaceTab(tab_interface,"EPS",4)
+obc_tab = InterfaceTab(tab_interface,"OBC",1,logger)
+adcs_tab = InterfaceTab(tab_interface,"ADCS",2,logger)
+sdr_tab = InterfaceTab(tab_interface,"SDR",3,logger)
+eps_tab = InterfaceTab(tab_interface,"EPS",4,logger)
 
 tab_interface.add(test_tab, text='Test')
 tab_interface.add(obc_tab, text='  OBC  ')
 tab_interface.add(adcs_tab, text='  ADCS  ')
 tab_interface.add(sdr_tab, text='  SDR  ')
 tab_interface.add(eps_tab, text='  EPS  ')
-
-
-######################################################################################################################
-#UART interface for connecting and disconnecting
-
-UART_frame = ttk.Frame(mainframe, padding=5)
-UART_frame.grid(row=2,column=0)
-UART_label = ttk.Label(UART_frame, text="Connect to UART")
-UART_label.grid(row=1,column=0,columnspan=2)
-
-#TEST MODE
-#Creates a check box to enable/disable test mode
-#Test mode will be used to test interface functions if no UART connection is present
-def change_mode():
-    global test_mode
-
-    if test_mode_switcher.get() == 1:
-        test_mode = TRUE
-    else:
-        test_mode = FALSE
-
-test_mode_switcher = IntVar()
-test_Mode = ttk.Checkbutton(UART_frame, text='Test Mode', variable=test_mode_switcher, onvalue=1, offvalue=0, command=change_mode)
-test_Mode.grid(column=3,row=0,sticky=E)
-
-#Creates entry boxes for UART port and baud rate
-#Sets default port and baud rate values
-port_entrytxt = StringVar(UART_frame, value="5")
-baud_entrytxt = StringVar(UART_frame, value="9600")
-
-ttk.Label(UART_frame,text="Port:").grid(column=0,row=2,sticky=W,pady=10)
-port_entry = ttk.Entry(UART_frame,textvariable=port_entrytxt)
-port_entry.grid(column=1,row=2)
-ttk.Label(UART_frame,text="Baud Rate:").grid(column=0,row=3,sticky=W)
-baud_entry = ttk.Entry(UART_frame,textvariable=baud_entrytxt)
-baud_entry.grid(column=1,row=3)
-
-# UART Port initialization
-def uart_init():  
-    global uart
-    global test_mode
-
-    port = "COM" + port_entry.get()
-    baud = baud_entry.get()
-
-    try:
-        uart = serial.Serial(port, baud, timeout=10)
-    except:
-        print("No UART Port Connected")
-        writeToLog("UART Connect- Failed")
-        if test_mode:
-            port_entry.config(state='disabled')
-            baud_entry.config(state='disabled')
-            connect_to_UART.config(state='disabled')
-            disconnect_UART.config(state='!disabled')
-            UART_label.config(text='UART Connected')
-        return
-        
-    #If UART connects successfully (or test mode is enabled), disables port and baud rate entry boxes
-    if uart.is_open:
-        print("UART Port Open")
-        writeToLog("UART Connect- Success")
-        port_entry.config(state='disabled')
-        baud_entry.config(state='disabled')
-        connect_to_UART.config(state='disabled')
-        disconnect_UART.config(state='!disabled')
-        # Start reader thread
-        # reader_thread = uart_module.uart_reader(uart, logger)
-        # reader_thread = reader_thread
-        # print("UART Read Thread Started")
-        # reader_thread.start()
-    else:
-        print("UART Error! (Port probably not configured properly)")
-        writeToLog("UART Connect- Error")
-
-def uart_close():
-    global uart
-    writeToLog("UART Disconnect")
-    try:
-        uart.close()
-        print("UART Closed")
-    except:
-        print("UART Not Open")
-    
-    #Re-enables entry boxes and UART connect button, disables UART disconnect button
-    port_entry.config(state='!disabled')
-    baud_entry.config(state='!disabled')
-    connect_to_UART.config(state='!disabled')
-    disconnect_UART.config(state='disabled')
-    UART_label.config(text='Connect to UART')
-
-connect_to_UART = ttk.Button(UART_frame, text="Connect", command=uart_init)
-connect_to_UART.grid(column=0,row=4,pady=10,sticky=W)
-
-disconnect_UART = ttk.Button(UART_frame, text="Disconnect", command=uart_close, state='disabled')
-disconnect_UART.grid(column=1,row=4,pady=10,sticky=E)
 
 
 ######################################################################################################################
@@ -158,36 +88,19 @@ def get_cmd_list(tab_index):
     return(cmd_list)
 
 
-#Creates a terminal window on the side of the main window which displays the output of the program
-ttk.Label(mainframe, text="Command Log",padding=3).grid(row=0, column=1)
-log = Text(mainframe, state='disabled', width=40, height=24, wrap='none')
-log.grid(row=1, column=1, rowspan=2, sticky=NSEW)
-
-#Prints a message in the logging (terminal) window
-def writeToLog(msg):
-    numlines = int(log.index('end - 1 line').split('.')[0])
-    log['state'] = 'normal'
-    if numlines==24:
-        log.delete(1.0, 2.0)
-    if log.index('end-1c')!='1.0':
-        log.insert('end', '\n')
-    log.insert('end', msg)
-    log['state'] = 'disabled'
-
-
 ######################################################################################################################
 #Test Tab
 
 #Commands for basic packet-sending testing
 def send_packet():
     print("Send Packet (Currently nonfunctional)")
-    print(port_entry.get())
-    writeToLog("Send Packet")
+    #print(port_entry.get())
+    logger.writeToLog("Send Packet")
 
 def req_packet():
     global uart
 
-    writeToLog("Request Packet")
+    logger.writeToLog("Request Packet")
     if uart == NONE:
         print("UART Not Connected- Connect UART First")
         return
@@ -201,7 +114,7 @@ def req_packet():
         line = str(byte_line, 'utf-8')
         print("Beacon Text:")
         print(line)
-        writeToLog(line)
+        logger.writeToLog(line)
         elapsed_time = time.time() - start_time
 
 #Adds buttons to interface

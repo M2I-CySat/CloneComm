@@ -7,4 +7,9 @@ Checklist for future CloneComm development
     -Test mode will be used to print information to the terminal in the absence of UART
 * Print beacon messages to console
 
+* Need to connect "Send Command" button with the UART; this is difficult because the UART connection code and tab code are in separate files
+    -Also connect to log, although this is easier because log can always be accessed (unlike UART connection)
+* Made separate files
+* This might be one of the last key steps (other than debugging) necessary to complete CloneComm
+
 

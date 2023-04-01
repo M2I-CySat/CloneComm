@@ -1,9 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 import importlib
-from TypeCommand import TypeCommand
-from TypeCommand import create_TypeCommand
 from CySatPacket import *
+from CySatLog import CySatLog
 
 #Imports commands from CySatGlobal
 global_module = importlib.import_module('CySatGlobal')
@@ -16,12 +15,13 @@ global_module.populate_global_variables()
 #Creates ADCS tab
 class InterfaceTab(ttk.Frame):
 
-    def __init__(self, root, subsystem_name, subsystem_no):
+    def __init__(self, frame, subsystem_name, subsystem_no, log):
         
         super(InterfaceTab, self).__init__(padding=5)
-        self.root = root
+        self.frame = frame
         self.subsystem_name = subsystem_name
         self.subsystem_no = subsystem_no
+        self.log = log
 
         #Makes command list for specifically ADCS commands
         cmd_list = cmd_dictionary[subsystem_no]
@@ -89,13 +89,6 @@ class InterfaceTab(ttk.Frame):
         #Retrieves data from input box and selection from combobox
         def get_input():
 
-            input = create_TypeCommand(2,get_dropdown_selection())
-            print("System ID: " + str(input.sys_id))
-            print("Command ID: " + str(input.cmd_id))
-
-            #Erases input
-            input_box.delete(0,END)
-
             #Specifies sending packet information based on selected subsystem and command
             #Adds data from input box to end of packet (if applicable)
 
@@ -103,10 +96,19 @@ class InterfaceTab(ttk.Frame):
             Psys_id = get_dropdown_selection()
             Pcmd_id = subsystems_dict[subsystem_name]
 
+            #Creates a CySat Packet depending on selected subsystem and command
             sending_packet = Packet(Psys_id,Pcmd_id,payload)
+            print("System ID: " + str(sending_packet.type))
+            print("Command ID: " + str(sending_packet.cmd))
 
-            print("Packet Data: " + sending_packet.data)
-            return(sending_packet)
+            print("Packet Data: " + str(sending_packet.data))
+            log.writeToLog("Packet Data")
+
+            #Sends the packet over UART
+            log.sendPacket(sending_packet)
+
+            #Erases input
+            input_box.delete(0,END)
 
         #-------------------------------------------------------------------#
         #SEND COMMAND BUTTON
