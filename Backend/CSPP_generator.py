@@ -76,7 +76,7 @@ def makeCySatPacket(subsystem, command, data, srcCall = "KB0MGQ", destCall = "W0
 
 # int, str, hex, then value, then byte count if int
 
-#makeCySatPacket("OBC","01",[])
+makeCySatPacket("OBC","01",[])
 
 
-makeCySatPacket("ADCS", "0d", [["int", 64, 2], ["str", "Hello"]])
+#makeCySatPacket("ADCS", "0d", [["int", 64, 2], ["str", "Hello"]])

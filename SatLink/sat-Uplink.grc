@@ -157,7 +157,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /home/cysat-radio/Desktop/CloneCommGNU/Packets/ax25fortransmission.txt
+    file: /home/cysat-radio/Desktop/CloneComm/Newly_Generated_CySat_Packet_For_Uplink
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -186,20 +186,6 @@ blocks:
     coordinate: [1128, 304.0]
     rotation: 0
     state: enabled
-- name: blocks_message_debug_0_0
-  id: blocks_message_debug
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    en_uvec: 'True'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [800, 408.0]
-    rotation: 0
-    state: disabled
 - name: digital_gfsk_mod_0
   id: digital_gfsk_mod
   parameters:
@@ -367,28 +353,6 @@ blocks:
     coordinate: [504, 292.0]
     rotation: 0
     state: true
-- name: satellites_satellite_decoder_1
-  id: satellites_satellite_decoder
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    definition: file
-    file: C:\Users\Ultim\OneDrive\Desktop\satellites stuff\CloneCommGNU Partial\CYSAT.yml
-    iq: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    name: ''
-    norad: '0'
-    options: '""'
-    samp_rate: samp_rate
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [504, 452.0]
-    rotation: 0
-    state: disabled
 - name: uhd_usrp_sink_0
   id: uhd_usrp_sink
   parameters:
@@ -673,7 +637,6 @@ connections:
 - [digital_gfsk_mod_0, '0', qtgui_time_sink_x_0, '0']
 - [digital_gfsk_mod_0, '0', rational_resampler_xxx_1, '0']
 - [rational_resampler_xxx_1, '0', uhd_usrp_sink_0, '0']
-- [satellites_satellite_decoder_1, out, blocks_message_debug_0_0, print_pdu]
 - [uhd_usrp_sink_0, async_msgs, blocks_message_debug_0, print]
 
 metadata:
