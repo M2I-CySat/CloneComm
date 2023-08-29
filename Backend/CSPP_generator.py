@@ -9,8 +9,19 @@ def appendData(inputBytearray, type, value, intbytecount = 1):
         case "hex":
             inputBytearray.extend(bytearray.fromhex(value))
 
-def makeCySatPacket(subsystem, command, data, dozeros, doaas, doax, srcCall = "KB0MGQ", destCall = "W0ISU "):
-    packetlength = 20
+def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCall = "KB0MGQ", destCall = "W0ISU "):
+    """
+    Generate CySat Packet for transmission.
+
+    :param str subsystem: What subsystem the message is meant for.
+    :param str command: Command ID in hex: "0x05"
+    :param str data: Data, kinda weird
+    :param bool dozeros: Whether or not the message is padded with zeros on either end
+    :param bool doax: Whether or not the message is wrapped in an ax.25 packet/Endurosat header (payload uses just CSPP)
+    :param replaceZeros: Replaces 0x00 with 5x 0xAA because something in the chain is terminating commands after 0x00.
+    :param str srcCall: Source callsign
+    :param str destCall: Destination callsign
+    """
 
     tempdata = bytearray()
 
@@ -57,12 +68,16 @@ def makeCySatPacket(subsystem, command, data, dozeros, doaas, doax, srcCall = "K
         # //subtract from 0xFF
         # return 0xFF - byte;
 
-
-
-    if len(fullcommand) < packetlength and doaas == "true":
-        for i in range (0, packetlength - len(fullcommand)):
-            fullcommand.extend(bytearray.fromhex("AA"))
-
+    # Zero replacement - UHF or something doesn't like 0x00s, so they are replacex with 5x 0xAA and re-replaced with 0x00 on the other end
+    if replaceZeros:
+        fullcommand2 = bytearray()
+        for i in range (0, len(fullcommand)):
+            if fullcommand[i] == 0x00:
+                fullcommand2.extend(bytearray.fromhex("AAAAAAAAAA"))
+            else:
+                fullcommand2.append(fullcommand[i])
+        fullcommand = fullcommand2
+    
     ax.display_bytearray_as_hex(fullcommand)
     if doax == "true":
         finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray', dozeros)
@@ -73,15 +88,5 @@ def makeCySatPacket(subsystem, command, data, dozeros, doaas, doax, srcCall = "K
 
 # int, str, hex, then value, then byte count if int
 
-<<<<<<< Updated upstream
-makeCySatPacket("OBC","01",[])
+makeCySatPacket("OBC","01",[], True, True, True)
 
-
-#makeCySatPacket("ADCS", "0d", [["int", 64, 2], ["str", "Hello"]])
-=======
-makeCySatPacket("OBC","01",[], "true", "true", "true")
-
-
-#makeCySatPacket("SDR", "1B", [["hex", "00"]], "false", "false", "false")
-#makeCySatPacket("SDR", "01",[], "false", "false", "false")
->>>>>>> Stashed changes
