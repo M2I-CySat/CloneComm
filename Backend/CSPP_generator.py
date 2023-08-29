@@ -9,7 +9,7 @@ def appendData(inputBytearray, type, value, intbytecount = 1):
         case "hex":
             inputBytearray.extend(bytearray.fromhex(value))
 
-def makeCySatPacket(subsystem, command, data, srcCall = "KB0MGQ", destCall = "W0ISU "):
+def makeCySatPacket(subsystem, command, data, dozeros, doaas, doax, srcCall = "KB0MGQ", destCall = "W0ISU "):
     packetlength = 20
 
     tempdata = bytearray()
@@ -43,40 +43,45 @@ def makeCySatPacket(subsystem, command, data, srcCall = "KB0MGQ", destCall = "W0
     
 
     # Temporary checksum
-    fullcommand.extend(bytearray.fromhex("00"))
 
     # TODO: Proper checksumming
-
-
-        # sum += packet.Subsystem_Type;
-        # sum += packet.Command;
-        # sum += packet.Data_Length;
-        # for(i = 0; i < packet.Data_Length; i++){
-        #     sum += packet.Data[i];
-        # }
-
+    sum = 0
+    for i in fullcommand:
+        sum += i
+        print("i is "+str(i)+", sum is "+str(sum))
         # //take the lowest 8 bitsvfr5
-        # uint8_t byte = (uint8_t) sum & 0xFF;
-
+    byte = sum & 0xFF
+    print("byte: "+str(byte))
+    checksum = 0xFF - byte
+    fullcommand.extend(checksum.to_bytes(1, 'big'))
         # //subtract from 0xFF
         # return 0xFF - byte;
 
 
 
-    if len(fullcommand) < packetlength:
+    if len(fullcommand) < packetlength and doaas == "true":
         for i in range (0, packetlength - len(fullcommand)):
             fullcommand.extend(bytearray.fromhex("AA"))
 
     ax.display_bytearray_as_hex(fullcommand)
-
-    finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray')
-    
-    f = open("Newly_Generated_CySat_Packet_For_Uplink", "wb")
+    if doax == "true":
+        finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray', dozeros)
+    else:
+        finalpacket = fullcommand
+    f = open("Newly_Generated_CySat_Packet_For_Uplink.bin", "wb")
     f.write(finalpacket)
 
 # int, str, hex, then value, then byte count if int
 
+<<<<<<< Updated upstream
 makeCySatPacket("OBC","01",[])
 
 
 #makeCySatPacket("ADCS", "0d", [["int", 64, 2], ["str", "Hello"]])
+=======
+makeCySatPacket("OBC","01",[], "true", "true", "true")
+
+
+#makeCySatPacket("SDR", "1B", [["hex", "00"]], "false", "false", "false")
+#makeCySatPacket("SDR", "01",[], "false", "false", "false")
+>>>>>>> Stashed changes
