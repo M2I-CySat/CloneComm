@@ -26,7 +26,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
     tempdata = bytearray()
 
     for a in data:
-        appendData(tempdata, a[0], a[1])
+        appendData(tempdata, a[0], a[1], a[2])
 
     dataLength = len(tempdata).to_bytes(1, "big")
 
@@ -88,5 +88,5 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
 
 # int, str, hex, then value, then byte count if int
 
-makeCySatPacket("OBC","01",[], True, True, True)
+makeCySatPacket("OBC","09",[["int", 5, 2]], True, True, True)
 
