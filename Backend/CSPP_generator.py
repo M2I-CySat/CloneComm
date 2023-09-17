@@ -3,7 +3,7 @@ import ax25_function as ax
 def appendData(inputBytearray, type, value, intbytecount = 1):
     match type:
         case "int":
-            inputBytearray.extend(value.to_bytes(intbytecount, "big"))
+            inputBytearray.extend(value.to_bytes(intbytecount, "little"))
         case "str":
             inputBytearray.extend(map(ord, value))
         case "hex":
@@ -79,7 +79,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
         fullcommand = fullcommand2
     
     ax.display_bytearray_as_hex(fullcommand)
-    if doax == "true":
+    if doax == True:
         finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray', dozeros)
     else:
         finalpacket = fullcommand
