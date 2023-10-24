@@ -85,8 +85,9 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
         finalpacket = fullcommand
     f = open("Newly_Generated_CySat_Packet_For_Uplink.bin", "wb")
     f.write(finalpacket)
+    return finalpacket
 
 # int, str, hex, then value, then byte count if int
 
-makeCySatPacket("OBC","09",[["int", 5, 2]], True, True, True)
+#makeCySatPacket("OBC","09",[["int", 5, 2]], True, True, True)
 
