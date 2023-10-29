@@ -1,15 +1,12 @@
-#   Created on: 
-#       Last Updated: Oct 3, 2023
+#   Created on: Oct 3, 2023
+#       Last Updated: Oct 29, 2023
 #       Author: Em Bradley-DeHaan
 
 
 import random
 
 
-packetNum = 0                       #variable for checking packet number
-readFile = "C:\\Users\\emmie\\Downloads\\packets927.txt"        #file to be read from, subject to change
-writeFile = "C:\\Users\\emmie\\OneDrive\\Desktop\\new.txt"      #file to be written to, subject to change
-
+packetNum = 0
 
 ##Imported from "composer.py":
 ##
@@ -50,6 +47,7 @@ def takeSecond(elem):
 ##not 0) and the packet number. If the current packet number is not
 ##the next expected packet, a string is returned
 def descramble(arr):
+    print("Starting descramble")
     global packetNum
     descrambled = [0] * len(arr)
     descrambledByte = 0
@@ -67,102 +65,56 @@ def descramble(arr):
             #descrambledByte = str(outbit) + descrambledByte
         descrambled[i] = descrambledByte
         descrambledByte = 0
+    print("Done descrambling")
 
+    #get which file extension type:
+    match descrambled[1]:
+        case 0x00:
+            filename = ".DAT"
+        case 0x01:
+            filename = ".KEL"
+        case 0x02:
+            filename = ".LIS"
+        case 0x03:
+            filename = ".HCK"
+        case 0x04:
+            filename = ".TXT"
+    print("Extension generated")
 
-    #CODE FOR CHECKING PACKET NUMBER : CURRENTLY DOES NOT FUNCTION PROPERLY
+    filename = "file" + packetNum + filename
+    print('Filename to create: {}'.format(filename))
 
-    # #receive and print measurement ID and packet number bytes:
-    # takeFirst(descrambled)
-    # curPacket = int.from_bytes(bytes.fromhex(takeSecond(descrambled)), byteorder="little")
-    
-    # #check for packet number:
-    # for i in range(curPacket):
-    #     #current packet number:
-    #     curPacket[i] = descrambled[i + 8]
+    #create a file to be written byte-by-byte:
+    print("Before file creation")
+    f = open(filename, "wb+")
+    print("After file creation")
 
-    # #check for missing packets:
-    # if packetNum < curPacket:
-    #     errorStr = "Missing Packet #" + str(packetNum)
-    #     print(errorStr)
-    #     packetNum = curPacket
-    # #increment packetNum global variable:
-    # packetNum += 1
+    #write descrambled array into the newly created file:
+    for i in range(len(descrambled)):
+        f.write(descrambled[i])
 
-
-    #don't input any unecessary packet information:
-    if descrambled[13] == 0:
-        return None
-    
-    data = [0] * 113
-    for i in range(len(data)):
-        data[i] = descrambled[i + 13]
-
-    return data
+    #close file:
+    print("Closing file")
+    f.close()
+    packetNum += 1
 
 
 ##Function that opens two text files--one for reading and one for appending. Upon
 ##determining if text files exist, function will read a file byte by byte until it 
 ##reaches the end of a packet, descramble the bytes in the packet, and then 
 ##append the descrambled packets to a separate file.
-def readTxt():
-    f = open(readFile, "rb")
-    fa = open(writeFile, "wb")
-    
-    #either file does not exist or could not be found:
-    if f == None or fa == None:
-        f.close()
-        fa.close()
-        return
+def readTxt(array):
     
     #initializing:
-    c = f.read(1)
-    c1 = hex(ord(c))                    #current byte being read
-    prevByte = 0x00                     #previous byte, used for checking the start of a packet
-    b = 0                               #other variable to test
-    data = [0] * 129                    #array to store bytes between each package
-    data2 = [0] * 113                   #array to store bytes to be transmitted to a file
+    j = 0
+    data = [0] * 129            #array to store bytes between each package
 
-    #check value of the current byte being read:
-    while True:
-
-        #packet start:
-        if prevByte == '0x80' and c1 == '0xff':
-            b += 1
-        #found a packet:
-        elif b == 1 and c1 == '0xaa' and prevByte == '0xff':
-            b = 0
-
-            #take data and store in an array:
-            for i in range(len(data)):
-                c = ord(f.read(1))
-                data[i] = c
-
-            #descramble data:
-            data2 = descramble(data)
-
-            #make sure new data array actually has data:
-            if (data2 != None):
-                #add descrambled array to descrambled.txt file:
-                for i in range(len(data2)):
-                    if (data2[i] == 170):
-                        break
-                    fa.write(data2[i].to_bytes(1))
-            #no more data to write:
-            else:
-                break
-
-        #read next byte:
-        prevByte = c1
-        c = f.read(1)
-        if (len(c) == 0):
+    #take data and store in an array:
+    for i in range(len(data)):
+        data[i] = array[j]
+        j += 1
+        if j >= 129:
             break
-        c1 = hex(ord(c))
 
-
-    #close files:
-    f.close()
-    fa.close()
-        
-            
-#testing out the descrambler:
-readTxt()
+    #descramble data:
+    descramble(data)

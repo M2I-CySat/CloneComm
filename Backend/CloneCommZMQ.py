@@ -13,6 +13,7 @@ import numpy as np
 import CSPP_generator as cspp
 import crcmod
 import TC_45
+import descrambler
 
 addr = "10.26.193.182"
 
@@ -91,6 +92,8 @@ while True:
                 print(statusmessage)
                 if descramble==True:
                     print("Packet descrambler goes here")
+                    descrambler.readTxt(messagerx[2:])
+                    print("After descramble")
                 
                 break
     except zmq.Again as e:
