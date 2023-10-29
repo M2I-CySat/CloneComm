@@ -48,16 +48,16 @@ socket_rx.subscribe("")
 
 #message = cspp.makeCySatPacket("OBC","01",[], True, True, True)
 
-message = TC_45.TC_45()
+#message = TC_45.TC_45()
 
 i=0
 while True:
-    if i%500 == 0:
-        message_length = len(message)
-        pdu = pmt.cons(pmt.PMT_NIL,pmt.init_u8vector(message_length,(message)))
-
-        socket_tx.send(pmt.serialize_str(pdu))
-        #print("Sending "+str(i))
+    #if i%500 == 0:
+    #    message_length = len(message)
+    #    pdu = pmt.cons(pmt.PMT_NIL,pmt.init_u8vector(message_length,(message)))
+#
+    #    socket_tx.send(pmt.serialize_str(pdu))
+    #    #print("Sending "+str(i))
 
     try:
         messagerx = socket_rx.recv(flags=zmq.NOBLOCK)

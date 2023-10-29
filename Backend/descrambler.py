@@ -106,15 +106,11 @@ def descramble(arr):
 def readTxt(array):
     
     #initializing:
-    j = 0
     data = [0] * 129            #array to store bytes between each package
 
     #take data and store in an array:
     for i in range(len(data)):
-        data[i] = array[j]
-        j += 1
-        if j >= 129:
-            break
+        data[i] = array[i]
 
     #descramble data:
     descramble(data)
