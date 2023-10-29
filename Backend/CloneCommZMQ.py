@@ -92,7 +92,8 @@ while True:
                 print(statusmessage)
                 if descramble==True:
                     print("Packet descrambler goes here")
-                    descrambler.readTxt(messagerx[2:])
+                    messagerx = messagerx[2:]
+                    descrambler.readTxt(messagerx)
                     print("After descramble")
                 
                 break
