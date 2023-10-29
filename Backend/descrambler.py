@@ -109,7 +109,8 @@ def readTxt(array):
     data = [0] * 129            #array to store bytes between each package
 
     #take data and store in an array:
-    for i in range(len(data)):
+    for i in range(len(array)):
+        print(array[i])
         data[i] = array[i]
 
     #descramble data:
