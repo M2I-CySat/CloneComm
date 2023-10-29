@@ -23,62 +23,63 @@ def endian_swap_double(invar):
     return outvar
 
 
-#response = requests.get("https://tle.ivanstanojevic.me/api/tle/25544")
-text = "{\"@context\":\"https:\/\/www.w3.org\/ns\/hydra\/context.jsonld\",\"@id\":\"https:\/\/tle.ivanstanojevic.me\/api\/tle\/25544\",\"@type\":\"Tle\",\"satelliteId\":25544,\"name\":\"ISS (ZARYA)\",\"date\":\"2023-10-16T04:13:26+00:00\",\"line1\":\"1 25544U 98067A   23289.17600325  .00022066  00000+0  38962-3 0  9994\",\"line2\":\"2 25544  51.6421  89.2403 0004841 108.6565  62.5649 15.50277152420558\"}"
-#print("Status Code: "+str(response.status_code))
+def TC_45():
 
-#text = response.text
+    #response = requests.get("https://tle.ivanstanojevic.me/api/tle/25544")
+    text = "{\"@context\":\"https:\/\/www.w3.org\/ns\/hydra\/context.jsonld\",\"@id\":\"https:\/\/tle.ivanstanojevic.me\/api\/tle\/25544\",\"@type\":\"Tle\",\"satelliteId\":25544,\"name\":\"ISS (ZARYA)\",\"date\":\"2023-10-16T04:13:26+00:00\",\"line1\":\"1 25544U 98067A   23289.17600325  .00022066  00000+0  38962-3 0  9994\",\"line2\":\"2 25544  51.6421  89.2403 0004841 108.6565  62.5649 15.50277152420558\"}"
+    #print("Status Code: "+str(response.status_code))
 
-print("Response Contents:")
-print(text)
+    #text = response.text
 
-array1 = text.split(",")
+    print("Response Contents:")
+    print(text)
 
-for item in array1:
-    print("Item: "+str(item))
+    array1 = text.split(",")
 
-values = array1[6].split()+array1[7].split()
+    for item in array1:
+        print("Item: "+str(item))
 
-for item in values:
-    print("Value: "+str(item))
+    values = array1[6].split()+array1[7].split()
 
-
-
-
-
-
-Inclination = double_to_hex(float(values[11]))
-Eccentricity = double_to_hex(float("0."+values[13]))
-RAAN = double_to_hex(float(values[12]))
-AOP = double_to_hex(float(values[14]))
+    for item in values:
+        print("Value: "+str(item))
 
 
 
-bstarexp = float(values[6][-2:])
-bstarbase = float("0."+values[6][:5])
-bstar = bstarbase*(10**bstarexp)
-bstar = double_to_hex(bstar)
-meanmotion = double_to_hex(float(values[16][:-2]))
-meananomaly = double_to_hex(float(values[15]))
-Epoch = double_to_hex(float(values[3]))
-
-output = bytearray()
-
-output.extend(bytearray.fromhex(Inclination[2:]))
-output.extend(bytearray.fromhex(Eccentricity[2:]))
-output.extend(bytearray.fromhex(RAAN[2:]))
-output.extend(bytearray.fromhex(AOP[2:]))
-output.extend(bytearray.fromhex(bstar[2:]))
-output.extend(bytearray.fromhex(meanmotion[2:]))
-output.extend(bytearray.fromhex(meananomaly[2:]))
-output.extend(bytearray.fromhex(Epoch[2:]))
 
 
 
-CSPP.ax.display_bytearray_as_hex(output)
+    Inclination = double_to_hex(float(values[11]))
+    Eccentricity = double_to_hex(float("0."+values[13]))
+    RAAN = double_to_hex(float(values[12]))
+    AOP = double_to_hex(float(values[14]))
 
 
-CSPP.makeCySatPacket("ADCS","07",[["int", 5, 2]], True, True, True) #TODO: Make command number real number
 
+    bstarexp = float(values[6][-2:])
+    bstarbase = float("0."+values[6][:5])
+    bstar = bstarbase*(10**bstarexp)
+    bstar = double_to_hex(bstar)
+    meanmotion = double_to_hex(float(values[16][:-2]))
+    meananomaly = double_to_hex(float(values[15]))
+    Epoch = double_to_hex(float(values[3]))
+
+    output = bytearray()
+
+    output.extend(bytearray.fromhex(Inclination[2:]))
+    output.extend(bytearray.fromhex(Eccentricity[2:]))
+    output.extend(bytearray.fromhex(RAAN[2:]))
+    output.extend(bytearray.fromhex(AOP[2:]))
+    output.extend(bytearray.fromhex(bstar[2:]))
+    output.extend(bytearray.fromhex(meanmotion[2:]))
+    output.extend(bytearray.fromhex(meananomaly[2:]))
+    output.extend(bytearray.fromhex(Epoch[2:]))
+
+
+
+    CSPP.ax.display_bytearray_as_hex(output)
+
+    return CSPP.makeCySatPacket("ADCS","07",[["bytearray", output,"blah"]], True, True, True) #TODO: Make command number real number
+TC_45()
 
 

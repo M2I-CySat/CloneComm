@@ -8,6 +8,8 @@ def appendData(inputBytearray, type, value, intbytecount = 1):
             inputBytearray.extend(map(ord, value))
         case "hex":
             inputBytearray.extend(bytearray.fromhex(value))
+        case "bytearray":
+            inputBytearray.extend(value)
 
 def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCall = "KB0MGQ", destCall = "W0ISU "):
     """
@@ -90,4 +92,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
 # int, str, hex, then value, then byte count if int
 
 #makeCySatPacket("OBC","09",[["int", 5, 2]], True, True, True)
+#makeCySatPacket("SDR","19",[["int",15,1]],False,False,False)
+#makeCySatPacket("SDR","1B",[["int",0,1]],False,False,False)
+#makeCySatPacket("SDR","1B",[["int",1,1]],False,False,False)
 

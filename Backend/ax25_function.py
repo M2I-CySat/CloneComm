@@ -76,6 +76,15 @@ def return_bytearray_as_hex(thestring):
         # fullstring=fullstring+(" ")
     return (fullstring)
 
+def return_bytearray_as_hex_spaces(thestring):
+    fullstring = ""
+    for i in range(0, len(thestring)):
+        if (len(str(hex(thestring[i])[2:]))) == 1:
+            fullstring = fullstring+"0"
+        fullstring = fullstring+hex(thestring[i])[2:]
+        fullstring=fullstring+(" ")
+    return (fullstring)
+
 
 def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
