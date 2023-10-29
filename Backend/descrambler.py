@@ -52,7 +52,7 @@ def descramble(arr):
     descrambled = [0] * len(arr)
     descrambledByte = 0
     lfsr = 0b00000000000000000000000000000000
-
+    arr = bytearray(arr)
     #start descrambling:
     for i in range(len(descrambled)):
         for j in range(8):
@@ -64,11 +64,12 @@ def descramble(arr):
             descrambledByte = (descrambledByte << 1) | outbit
             #descrambledByte = str(outbit) + descrambledByte
         descrambled[i] = descrambledByte
+        print("Byte "+str(i)+" Int "+str(int(descrambledByte))+" Str "+str(descrambledByte))
         descrambledByte = 0
     print("Done descrambling")
-
+    descrambled = bytearray(descrambled)
     #get which file extension type:
-    match descrambled[1]:
+    match descrambled[3]:
         case 0x00:
             filename = ".DAT"
         case 0x01:
@@ -81,7 +82,7 @@ def descramble(arr):
             filename = ".TXT"
     print("Extension generated")
 
-    filename = "file" + packetNum + filename
+    filename = "file" + str(packetNum) + filename
     print('Filename to create: {}'.format(filename))
 
     #create a file to be written byte-by-byte:
@@ -90,8 +91,10 @@ def descramble(arr):
     print("After file creation")
 
     #write descrambled array into the newly created file:
-    for i in range(len(descrambled)):
-        f.write(descrambled[i])
+    print("Descrambled length: "+str(len(descrambled)))
+    #for i in range(len(descrambled)):
+    #    f.write(descrambled[i])
+    f.write(descrambled)
 
     #close file:
     print("Closing file")
@@ -99,18 +102,18 @@ def descramble(arr):
     packetNum += 1
 
 
-##Function that opens two text files--one for reading and one for appending. Upon
-##determining if text files exist, function will read a file byte by byte until it 
-##reaches the end of a packet, descramble the bytes in the packet, and then 
-##append the descrambled packets to a separate file.
-def readTxt(array):
+# ##Function that opens two text files--one for reading and one for appending. Upon
+# ##determining if text files exist, function will read a file byte by byte until it 
+# ##reaches the end of a packet, descramble the bytes in the packet, and then 
+# ##append the descrambled packets to a separate file.
+# def readTxt(array):
     
-    #initializing:
-    data = [0] * 129            #array to store bytes between each package
+#     #initializing:
+#     data = [0] * 129            #array to store bytes between each package
 
-    #take data and store in an array:
-    for i in range(len(data)):
-        data[i] = array[i]
+#     #take data and store in an array:
+#     for i in range(len(array)):
+#         data[i] = array[i]
 
-    #descramble data:
-    descramble(data)
+#     #descramble data:
+#     descramble(data)
