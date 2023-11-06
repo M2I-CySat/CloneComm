@@ -62,58 +62,19 @@ def descramble(arr):
             X17 = (lfsr >> 17) & 1
             outbit = ((curbit) ^ ((X12 ^ X17))) & 1
             descrambledByte = (descrambledByte << 1) | outbit
-            #descrambledByte = str(outbit) + descrambledByte
         descrambled[i] = descrambledByte
         print("Byte "+str(i)+" Int "+str(int(descrambledByte))+" Str "+str(descrambledByte))
         descrambledByte = 0
     print("Done descrambling")
     descrambled = bytearray(descrambled)
-    #get which file extension type:
-    match descrambled[3]:
-        case 0x00:
-            filename = ".DAT"
-        case 0x01:
-            filename = ".KEL"
-        case 0x02:
-            filename = ".LIS"
-        case 0x03:
-            filename = ".HCK"
-        case 0x04:
-            filename = ".TXT"
-    print("Extension generated")
 
-    filename = "file" + str(packetNum) + filename
-    print('Filename to create: {}'.format(filename))
-
-    #create a file to be written byte-by-byte:
-    print("Before file creation")
-    f = open(filename, "wb+")
-    print("After file creation")
-
-    #write descrambled array into the newly created file:
-    print("Descrambled length: "+str(len(descrambled)))
-    #for i in range(len(descrambled)):
-    #    f.write(descrambled[i])
-    f.write(descrambled)
-
-    #close file:
-    print("Closing file")
-    f.close()
-    packetNum += 1
+    return descrambled
 
 
-# ##Function that opens two text files--one for reading and one for appending. Upon
-# ##determining if text files exist, function will read a file byte by byte until it 
-# ##reaches the end of a packet, descramble the bytes in the packet, and then 
-# ##append the descrambled packets to a separate file.
-# def readTxt(array):
-    
-#     #initializing:
-#     data = [0] * 129            #array to store bytes between each package
+##This function fills in a file with 0xAA bytes if a packet is detected to be missing.
+def fillData(bytes):
+    data = [0] * 126
+    data[0:12] = bytes
+    data[13:125] = {0xAA}
 
-#     #take data and store in an array:
-#     for i in range(len(array)):
-#         data[i] = array[i]
-
-#     #descramble data:
-#     descramble(data)
+    return data
