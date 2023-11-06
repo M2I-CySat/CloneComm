@@ -215,19 +215,15 @@ def rxtask(connected2):
                                 match messagerx[5]:
                                     case 0x00:
                                         extension = ".DAT"
-                                        dataType = 0x00
                                     case 0x01:
                                         extension = ".KEL"
-                                        dataType = 0x01
                                     case 0x02:
                                         extension = ".LIS"
-                                        dataType = 0x02
                                     case 0x03:
                                         extension = ".HCK"
-                                        dataType = 0x03
                                     case _:
                                         extension = ".TXT"
-                                        dataType = 0x04
+                                dataType = messagerx[5]
                         case 0x0A:
                             statusmessage+= "[OBC] "
                         case 0x14:
