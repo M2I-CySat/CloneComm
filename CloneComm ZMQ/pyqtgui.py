@@ -9,6 +9,7 @@ import descrambler
 import CSPP_generator as cspp
 import pmt
 import ADCS
+from os.path import exists
 
 
 # C L O N E C O M M   Z M Q
@@ -189,6 +190,9 @@ def rxtask(connected2):
     global socket_tx
     global socket_rx
     global connected
+    filename = ""
+    extension = ""
+    j = 0
     print(str(connected))
     while connected:
         try:
@@ -207,6 +211,23 @@ def rxtask(connected2):
                         case 0xAA:
                             statusmessage+= "[PACKET] "
                             descramble = True
+                            if exists(filename) == False:
+                                match messagerx[5]:
+                                    case 0x00:
+                                        extension = ".DAT"
+                                        dataType = 0x00
+                                    case 0x01:
+                                        extension = ".KEL"
+                                        dataType = 0x01
+                                    case 0x02:
+                                        extension = ".LIS"
+                                        dataType = 0x02
+                                    case 0x03:
+                                        extension = ".HCK"
+                                        dataType = 0x03
+                                    case _:
+                                        extension = ".TXT"
+                                        dataType = 0x04
                         case 0x0A:
                             statusmessage+= "[OBC] "
                         case 0x14:
@@ -226,7 +247,35 @@ def rxtask(connected2):
                     if descramble==True:
                         print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
-                        descrambler.descramble(messagerx)
+                        # check packet ID and ensure that no packet is missing:
+                        packetID = int.from_bytes(messagerx[8:11], byteorder="big")
+                        #packet/packets is/are missing:
+                        if packetID > j:
+                            #fill in file until reached current packet ID number:
+                            while packetID > j:
+                                arr = [0] * 8
+                                # three 0xAA bytes:
+                                arr[0:2] = {0xAA}
+                                # data type:
+                                arr[3] = dataType
+                                # measurement ID bytes:
+                                arr[4:7] = bytearray(messagerx[4:7], byteorder="big")
+                                # packet ID bytes:
+                                arr[8:11] = bytearray(j, byteorder="big")
+                                #bytes read:
+                                arr[12] = bytes(71)
+                                # write to file:
+                                filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(j) + extension
+                                fw = open(filename, "wb+")
+                                fw.write(descrambler.fillData(arr))
+                                fw.close()
+                                j += 1
+                            #write current data:
+                            filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(packetID) + extension
+                            fw = open(filename, "wb+")
+                            fw.write(descrambler.descramble(messagerx))
+                            fw.close()
+                            j += 1
                         print("After descramble")
                     
                     break
