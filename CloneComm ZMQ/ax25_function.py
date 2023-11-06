@@ -294,6 +294,6 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     else:
         withzeros.extend(overall)
     # print("CRC value: "+hex(crc_value)[2:].zfill(4))
-    print("Hex bytes: ", end="")
-    display_bytearray_as_hex(withzeros)
+    #print("Hex bytes: ", end="")
+    #display_bytearray_as_hex(withzeros)
     return withzeros

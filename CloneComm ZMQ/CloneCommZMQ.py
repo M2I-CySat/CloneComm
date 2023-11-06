@@ -21,7 +21,8 @@ import tkinter
 multitasking.set_max_threads(2)
 signal.signal(signal.SIGINT, multitasking.killall)
 
-addr = "10.26.193.182"
+#addr = "10.26.193.182"
+addr = "127.0.0.1"
 
 
 def str_to_array(stra):

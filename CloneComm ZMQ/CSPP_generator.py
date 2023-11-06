@@ -61,10 +61,10 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
     sum = 0
     for i in fullcommand:
         sum += i
-        print("i is "+str(i)+", sum is "+str(sum))
+        #print("i is "+str(i)+", sum is "+str(sum))
         # //take the lowest 8 bitsvfr5
     byte = sum & 0xFF
-    print("byte: "+str(byte))
+    #print("byte: "+str(byte))
     checksum = 0xFF - byte
     fullcommand.extend(checksum.to_bytes(1, 'big'))
         # //subtract from 0xFF
@@ -80,7 +80,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
                 fullcommand2.append(fullcommand[i])
         fullcommand = fullcommand2
     
-    ax.display_bytearray_as_hex(fullcommand)
+    #ax.display_bytearray_as_hex(fullcommand)
     if doax == True:
         finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray', dozeros)
     else:
