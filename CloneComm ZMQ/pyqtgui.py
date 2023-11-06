@@ -310,8 +310,20 @@ def get_datatype(str):
             return 4
 
 # Where the GUI is set up
+
+
+class button():
+    def __init__(self, layout, text, command,x,y):
+        global socket_tx
+        self = qt.QPushButton(text)
+        self.clicked.connect(command)
+        layout.addWidget(self,1,1)
+
+
+
 def main():
     global connected
+    global socket_tx
 
     # Setup the layouts
     mainlayout = qt.QVBoxLayout()
@@ -322,9 +334,10 @@ def main():
 
     # Initialie Command Send Area
 
-    b1 = qt.QPushButton("Ping Satellite")
-    b1.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True))) # Done
-    commandlayout.addWidget(b1,1,1)
+    # b1 = qt.QPushButton("Ping Satellite")
+    # b1.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True))) # Done
+    # commandlayout.addWidget(b1,1,1)
+    button(commandlayout,"Ping Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True)),1,1)
 
     b2 = qt.QPushButton("ADCS TLE")
     b2.clicked.connect(lambda: uplink(ADCS.TC_45)) # Done
@@ -392,7 +405,7 @@ def main():
     # TCP Connect Tab
     tcplayout = qt.QGridLayout()
 
-    ipbox = qt.QLineEdit("10.26.193.182")
+    ipbox = qt.QLineEdit("10.26.195.170")
     tcplayout.addWidget(qt.QLabel("Server IP"),1,1)
     tcplayout.addWidget(ipbox,1,2)
 
@@ -422,7 +435,7 @@ def main():
 
 
     # Initialize Command Log
-    lowerlayout.addWidget(qt.QLabel("Command Log (Newest at top)"))
+    lowerlayout.addWidget(qt.QLabel("Command Log"))
 
     lowerlayout.addWidget(commandlogger)
 
