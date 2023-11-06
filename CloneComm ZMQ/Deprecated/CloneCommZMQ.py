@@ -17,6 +17,7 @@ import descrambler
 import multitasking
 import signal
 import tkinter
+from os.path import exists
 
 multitasking.set_max_threads(2)
 signal.signal(signal.SIGINT, multitasking.killall)
@@ -79,6 +80,8 @@ def rxtask():
         try:
             messagerx = socket_rx.recv(flags=zmq.NOBLOCK)
             statusmessage = ""
+            filename = ""
+            extension = ""
             descramble = False
             for i in range(0,len(messagerx)):
                 if messagerx[i] == 0xFF:
@@ -91,6 +94,20 @@ def rxtask():
                         case 0xAA:
                             statusmessage+= "[PACKET] "
                             descramble = True
+                            # see if file is already open, if not, create it:
+                            if exists(filename) == False:
+                                match messagerx[5]:
+                                    case 0x00:
+                                        extension = ".DAT"
+                                    case 0x01:
+                                        extension = ".KEL"
+                                    case 0x02:
+                                        extension = ".LIS"
+                                    case 0x03:
+                                        extension = ".HCK"
+                                    case _:
+                                        extension = ".TXT"
+                                dataType = messagerx[5]
                         case 0x0A:
                             statusmessage+= "[OBC] "
                         case 0x14:
@@ -110,8 +127,35 @@ def rxtask():
                     if descramble==True:
                         print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
-                        descrambler.descramble(messagerx)
-                        print("After descramble")
+                        # check packet ID and ensure that no packet is missing:
+                        packetID = int.from_bytes(messagerx[8:11], byteorder="big")
+                        #packet/packets is/are missing:
+                        if packetID > j:
+                            #fill in file until reached current packet ID number:
+                            while packetID > j:
+                                arr = [0] * 8
+                                # three 0xAA bytes:
+                                arr[0:2] = {0xAA}
+                                # data type:
+                                arr[3] = dataType
+                                # measurement ID bytes:
+                                arr[4:7] = bytearray(messagerx[4:7], byteorder="big")
+                                # packet ID bytes:
+                                arr[8:11] = bytearray(j, byteorder="big")
+                                #bytes read:
+                                arr[12] = bytes(71)
+                                # write to file:
+                                filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(j) + extension
+                                fw = open(filename, "wb+")
+                                fw.write(descrambler.fillData(arr))
+                                fw.close()
+                                j += 1
+                            #write current data:
+                            filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(packetID) + extension
+                            fw = open(filename, "wb+")
+                            fw.write(descrambler.descramble(messagerx))
+                            fw.close()
+                            j += 1
                     
                     break
         except zmq.Again as e:
