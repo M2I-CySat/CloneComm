@@ -285,6 +285,18 @@ def main():
 
     # Initialie Command Send Area
 
+    # Initialize Feature Tabs
+    ctabs = qt.QTabWidget()
+    OBCTab = qt.QWidget()
+    ADCSTab = qt.QWidget()
+    EPSTab = qt.QWidget()
+    UHFTab = qt.QWidget()
+    PayloadTab = qt.QWidget()
+    EOLTab = qt.QWidget()
+
+    # TCP Connect Tab
+    tcplayout = qt.QGridLayout()
+
     # b1 = qt.QPushButton("Ping Satellite")
     # b1.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True))) # Done
     # commandlayout.addWidget(b1,1,1)
@@ -343,7 +355,16 @@ def main():
     b7.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","11",[["int",int(numsel.text()),4],["int",get_datatype(typesel.currentText()),4],["int",int(spsel.text()),4],["int",int(epsel.text()),4]], True, True, True))) # Done?
     commandlayout.addWidget(b7,5,1)
 
+    # Combine tabs into one thing
+    ctabs.addTab(OBCTab,"OBC")
+    ctabs.addTab(ADCSTab,"ADCS")
+    ctabs.addTab(EPSTab,"EPS")
+    ctabs.addTab(UHFTab,"UHF")
+    ctabs.addTab(PayloadTab,"Payload")
+    ctabs.addTab(EOLTab,"EOL")
 
+    #upperlayout.addLayout(commandlayout)
+    upperlayout.addWidget(ctabs)
 
 
     # Initialize Feature Tabs
