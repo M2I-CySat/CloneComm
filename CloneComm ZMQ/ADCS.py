@@ -2,7 +2,7 @@ import CSPP_generator as CSPP
 import struct
 import array
 import binascii
-
+import time
 import requests
 
 def double_to_hex(f):
@@ -21,6 +21,10 @@ def endian_swap_double(invar):
 
 
     return outvar
+
+def TC_2():
+    unixTimestamp = int(round(time.time()))
+    return CSPP.makeCySatPacket("ADCS","05",[["int",unixTimestamp,4],["int",0,2]], True, True, True)
 
 
 def TC_45():
@@ -80,6 +84,3 @@ def TC_45():
     CSPP.ax.display_bytearray_as_hex(output)
 
     return CSPP.makeCySatPacket("ADCS","07",[["bytearray", output,"blah"]], True, True, True) #TODO: Make command number real number
-TC_45()
-
-
