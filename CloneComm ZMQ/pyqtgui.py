@@ -266,12 +266,13 @@ def rxtask(connected2):
                                 fw.write(descrambler.fillData(arr))
                                 fw.close()
                                 j += 1
-                            #write current data:
-                            filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(packetID) + extension
-                            fw = open(filename, "wb+")
-                            fw.write(descrambler.descramble(messagerx))
-                            fw.close()
-                            j += 1
+                        
+                        #write current data:
+                        filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(packetID) + extension
+                        fw = open(filename, "wb+")
+                        fw.write(descrambler.descramble(messagerx))
+                        fw.close()
+                        j += 1
                         print("After descramble")
                     
                     break
