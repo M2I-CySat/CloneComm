@@ -1,29 +1,0 @@
-Current Unix time: 1698705065 seconds, 648 milliseconds
-Estimated attitude angles: 0.570000 deg (roll), 0.000000 deg (pitch), 7.420000 deg (yaw)
-Estimated angular rates: 0.900000 deg/s (x), 0.000000 deg/s (y), -298.399994 deg/s (z)
-Satellite position: 0.000000 deg (lattitude), 0.900000 deg (longitude)
-Altitude: 0.880000 km
-Magnetic Field Vector: 0.940000 uT (x), 0.000000 uT (y), -296.959991 uT (z)
-Nadir Vector: 0.000000 (x), 0.000000 (y), -2.961600 (z)
-Rate Sensor Rates: 0.570000 deg/s (x), 0.000000 deg/s (y), -295.559998 deg/s (z)
-Wheel Speed Measurement: 0 rpm
-Magnetorquer Commanded on-time: 0.320000 s (x), 0.000000 s (y), -294.519989 s (z)
-Wheel Speed Comman 0
-10: 0
-Raw Magnetometer: 23 (MagX), 0 (MagY), -29232 (MagZ)
-Current Measurements:
-3V3 Current: 26.367188 mA
-5V Current: 0.000000 mA
-Vbat Current: 17740.234375 mA
-Control Power Selections:
-CubeControl Signal PIC: 0
-CubeControl Motor PIC: 0
-CubeSense: 2
-CubeStar: 0
-CubeWheel1: 2
-CubeWheel2: 3
-CubeWheel3: 0
-Motor Electronics: 6
-GPS LNA: 1
-Commanded Attitude Angles: 1.110000 deg (roll), 0.000000 deg (pitch), -290.679993 deg (yaw)
-

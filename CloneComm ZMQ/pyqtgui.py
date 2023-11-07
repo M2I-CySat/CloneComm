@@ -194,6 +194,7 @@ def rxtask(connected2):
     filename = ""
     extension = ""
     packetIDs = [0]
+    j = 0
     filler = [0] * 113
     filler = {0xAA}
     print(str(connected))
@@ -239,8 +240,13 @@ def rxtask(connected2):
                         data = descrambler.descramble(messagerx)
 
                         # account for this packet being written:
-                        packetID = int.from_bytes(data[8:11], byteorder="big")
+                        packetID = int.from_bytes(data[8:11], byteorder="little")
+                        print("Packet ID: "+str(packetID))
+                        
+                        j += 1
+                        print("Appending " + str(packetID) + " to list.")
                         packetIDs.append(packetID)
+                        print("New item: " + str(packetIDs[j]))
 
                         # generation extension and save data type:
                         match data[3]:
@@ -275,7 +281,7 @@ def rxtask(connected2):
                         # print current packet:
                         filename = str(dataType) + extension
                         if exists(filename):
-                            f = open(filename, "ab")
+                            f = open(filename, "r+b")
                         else:
                             f = open(filename, "wb+")
                         f.seek(packetID*113)
@@ -283,18 +289,18 @@ def rxtask(connected2):
                         f.close()
 
                         #print("After descramble")
-                        log_output("[PACKET RX]: "+str(data[13:(data[12] + 13)]))
+                        #log_output("[PACKET RX]: "+str(data[13:(data[12] + 13)]))
                         sum = 0
                         i=0
-                        while sum<5:
+                        while i < len(packetIDs):
                             if i in packetIDs:
                                 a=1
                             else:
-                                print("Packet #{} missing.", i)
+                                print("Packet #"+str(i)+" missing.")
                                 sum+=1
                             i+=1
                         #log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
-                    
+                        
                     break
         except zmq.Again as e:
             e=1
