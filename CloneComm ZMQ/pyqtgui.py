@@ -193,7 +193,9 @@ def rxtask(connected2):
     global connected
     filename = ""
     extension = ""
-    j = 0
+    packetIDs = [0]
+    filler = [0] * 113
+    filler = {0xAA}
     print(str(connected))
     while connected:
         try:
@@ -231,38 +233,16 @@ def rxtask(connected2):
                     if descramble==True:
                         print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
-                        # check packet ID and ensure that no packet is missing:
-                        packetID = int.from_bytes(messagerx[8:11], byteorder="big")
-                        #packet/packets is/are missing:
-                        # if packetID > j:
-                        #     #fill in file until reached current packet ID number:
-                        #     while packetID > j:
-                        #         arr = [0] * 13
-                        #         # three 0xAA bytes:
-                        #         arr[0:2] = {0xAA}
-                        #         # data type:
-                        #         arr[3] = dataType
-                        #         # measurement ID bytes:
-                        #         arr[4:7] = messagerx[4:7]
-                        #         # packet ID bytes:
-                        #         arr[8:11] = j.to_bytes(4, byteorder = "big")
-                        #         #bytes read:
-                        #         arr[12] = messagerx[12]
-                        #         # write to file:
-                        #         filename = str(int.from_bytes(messagerx[4:7], byteorder="little")) + str(j) + extension
-                        #         fw = open(filename, "wb+")
-                        #         data = [0] * 126
-                        #         data = descrambler.fillData(arr)
-                        #         for i in range(len(data)):
-                        #             print(data[i])
-                        #             print(str(type(data[i])))
-                        #             fw.write(data[i].to_bytes(1,byteorder = "big"))
-                        #         fw.close()
-                        #         j += 1
                         
                         #write current data:
                         data = [0] * 131
                         data = descrambler.descramble(messagerx)
+
+                        # account for this packet being written:
+                        packetID = int.from_bytes(data[8:11], byteorder="big")
+                        packetIDs.append(packetID)
+
+                        # generation extension and save data type:
                         match data[3]:
                             case 0x00:
                                 extension = ".DAT"
@@ -274,15 +254,45 @@ def rxtask(connected2):
                                 extension = ".HCK"
                             case _:
                                 extension = ".TXT"
-                        filename = str(int.from_bytes(data[4:7], byteorder="little"))+ extension
+                        dataType = int.from_bytes(data[4:7], byteorder="little")
+
+                        # check for missing packets out of order
+                        # check for missing packets:
+                        # if packetID > j:
+                        #     log_output("Packet missing")
+                        #     while packetID > j:
+                        #         # make a call to seek()
+                        #         # seek(113 * missing packet #)
+                        #         filename = str(dataType) + extension
+                        #         if exists(filename):
+                        #             f = open(filename, "ab")
+                        #         else:
+                        #             f = open(filename, "wb+")
+                        #         f.write(filler)
+                        #         f.close()
+                        #         j += 1
+
+                        # print current packet:
+                        filename = str(dataType) + extension
                         if exists(filename):
                             f = open(filename, "ab")
                         else:
                             f = open(filename, "wb+")
-                        f.write(data[13:data[12]+13])
+                        f.seek(packetID*113)
+                        f.write(data[13:(data[12] + 13)])
                         f.close()
-                        j += 1
+
                         #print("After descramble")
+                        log_output("[PACKET RX]: "+str(data[13:(data[12] + 13)]))
+                        sum = 0
+                        i=0
+                        while sum<5:
+                            if i in packetIDs:
+                                a=1
+                            else:
+                                print("Packet #{} missing.", i)
+                                sum+=1
+                            i+=1
                         #log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
                     
                     break
@@ -290,6 +300,8 @@ def rxtask(connected2):
             e=1
         time.sleep(0.01)
         #log_output("Hello")
+        # put packet missing insertion here:
+
 
 # Sends a message to CySat
 def uplink(message):
