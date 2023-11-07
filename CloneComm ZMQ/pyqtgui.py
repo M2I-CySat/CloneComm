@@ -292,6 +292,7 @@ def rxtask(connected2):
                                 print("Packet #{} missing.", i)
                                 sum+=1
                             i+=1
+                        #log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
                     
                     break
         except zmq.Again as e:
