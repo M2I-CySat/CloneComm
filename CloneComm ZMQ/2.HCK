@@ -1,0 +1,31 @@
+Battery Voltage: 3.759540
+Battery Current: 0.210571
+BCR Voltage: 4.091746
+BCR Current: 0.575256
+X Voltage: 0.007324
+X- Current: 0.001831
+X+ Current: 0.001831
+Y Voltage: 0.007324
+Y- Current: 0.001831
+Y+ Current: 0.001831
+Z Voltage: 0.007324
+Z- Current: 0.001831
+Z+ Current: 0.001831
+3V Current: 0.124105
+5V Current: 0.024414
+MCU Temp: 25.538105
+Battery 1 Temp: 24.062500
+Battery 2 Temp: 23.812500
+Battery 3 Temp: 23.437500
+Battery 4 Temp: 23.437500
+Input Condition: 123
+Output Condition 1: 2207
+Output Condition 2: 2207
+Power On Cycles: 2370
+Under Volt Count: 670
+Short Circuit Count: 5389
+Over Temp Count: 6
+Charge Cycles: 0
+Defaults 1: 4
+Defaults 2: 0
+

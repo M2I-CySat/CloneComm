@@ -47,7 +47,7 @@ def takeSecond(elem):
 ##not 0) and the packet number. If the current packet number is not
 ##the next expected packet, a string is returned
 def descramble(arr):
-    print("Starting descramble")
+    #print("Starting descramble")
     global packetNum
     descrambled = [0] * len(arr)
     descrambledByte = 0
@@ -63,9 +63,9 @@ def descramble(arr):
             outbit = ((curbit) ^ ((X12 ^ X17))) & 1
             descrambledByte = (descrambledByte << 1) | outbit
         descrambled[i] = descrambledByte
-        print("Byte "+str(i)+" Int "+str(int(descrambledByte))+" Str "+str(descrambledByte))
+        #print("Byte "+str(i)+" Int "+str(int(descrambledByte))+" Str "+str(descrambledByte))
         descrambledByte = 0
-    print("Done descrambling")
+    #print("Done descrambling")
     descrambled = bytearray(descrambled)
 
     return descrambled

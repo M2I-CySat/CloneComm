@@ -211,19 +211,6 @@ def rxtask(connected2):
                         case 0xAA:
                             statusmessage+= "[PACKET] "
                             descramble = True
-                            if exists(filename) == False:
-                                match messagerx[5]:
-                                    case 0x00:
-                                        extension = ".DAT"
-                                    case 0x01:
-                                        extension = ".KEL"
-                                    case 0x02:
-                                        extension = ".LIS"
-                                    case 0x03:
-                                        extension = ".HCK"
-                                    case _:
-                                        extension = ".TXT"
-                                dataType = messagerx[5]
                         case 0x0A:
                             statusmessage+= "[OBC] "
                         case 0x14:
@@ -246,34 +233,56 @@ def rxtask(connected2):
                         # check packet ID and ensure that no packet is missing:
                         packetID = int.from_bytes(messagerx[8:11], byteorder="big")
                         #packet/packets is/are missing:
-                        if packetID > j:
-                            #fill in file until reached current packet ID number:
-                            while packetID > j:
-                                arr = [0] * 8
-                                # three 0xAA bytes:
-                                arr[0:2] = {0xAA}
-                                # data type:
-                                arr[3] = dataType
-                                # measurement ID bytes:
-                                arr[4:7] = bytearray(messagerx[4:7], byteorder="big")
-                                # packet ID bytes:
-                                arr[8:11] = bytearray(j, byteorder="big")
-                                #bytes read:
-                                arr[12] = bytes(71)
-                                # write to file:
-                                filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(j) + extension
-                                fw = open(filename, "wb+")
-                                fw.write(descrambler.fillData(arr))
-                                fw.close()
-                                j += 1
+                        # if packetID > j:
+                        #     #fill in file until reached current packet ID number:
+                        #     while packetID > j:
+                        #         arr = [0] * 13
+                        #         # three 0xAA bytes:
+                        #         arr[0:2] = {0xAA}
+                        #         # data type:
+                        #         arr[3] = dataType
+                        #         # measurement ID bytes:
+                        #         arr[4:7] = messagerx[4:7]
+                        #         # packet ID bytes:
+                        #         arr[8:11] = j.to_bytes(4, byteorder = "big")
+                        #         #bytes read:
+                        #         arr[12] = messagerx[12]
+                        #         # write to file:
+                        #         filename = str(int.from_bytes(messagerx[4:7], byteorder="little")) + str(j) + extension
+                        #         fw = open(filename, "wb+")
+                        #         data = [0] * 126
+                        #         data = descrambler.fillData(arr)
+                        #         for i in range(len(data)):
+                        #             print(data[i])
+                        #             print(str(type(data[i])))
+                        #             fw.write(data[i].to_bytes(1,byteorder = "big"))
+                        #         fw.close()
+                        #         j += 1
                         
                         #write current data:
-                        filename = str(int.from_bytes(messagerx[4:7], byteorder="big")) + str(packetID) + extension
-                        fw = open(filename, "wb+")
-                        fw.write(descrambler.descramble(messagerx))
-                        fw.close()
+                        data = [0] * 131
+                        data = descrambler.descramble(messagerx)
+                        match data[3]:
+                            case 0x00:
+                                extension = ".DAT"
+                            case 0x01:
+                                extension = ".KEL"
+                            case 0x02:
+                                extension = ".LIS"
+                            case 0x03:
+                                extension = ".HCK"
+                            case _:
+                                extension = ".TXT"
+                        filename = str(int.from_bytes(data[4:7], byteorder="little"))+ extension
+                        if exists(filename):
+                            f = open(filename, "ab")
+                        else:
+                            f = open(filename, "wb+")
+                        f.write(data[13:data[12]+13])
+                        f.close()
                         j += 1
-                        print("After descramble")
+                        #print("After descramble")
+                        log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
                     
                     break
         except zmq.Again as e:
@@ -365,7 +374,7 @@ def main():
     commandlayout.addWidget(b5,2,2)
 
     b6 = qt.QPushButton("UHF Health Check")
-    b6.clicked.connect(lambda: uplink(cspp.makeCySatPacket("UHF","33",[], True, True, True))) # Done
+    b6.clicked.connect(lambda: uplink(cspp.makeCySatPacket("UHF","23",[], True, True, True))) # Done
     commandlayout.addWidget(b6,2,3)
 
     b8 = qt.QPushButton("Request File List")
