@@ -40,6 +40,7 @@ global socket_rx
 
 # Basic Window Configuration
 app = qt.QApplication([])
+app.setStyle("Windows")
 window = qt.QWidget()
 window.setWindowTitle("CloneComm ZMQ")
 window.setFixedWidth(1000)
