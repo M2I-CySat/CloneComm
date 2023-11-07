@@ -282,7 +282,7 @@ def rxtask(connected2):
                         f.close()
                         j += 1
                         #print("After descramble")
-                        log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
+                        #log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
                     
                     break
         except zmq.Again as e:
