@@ -476,7 +476,17 @@ def main():
     button(epsclayout,"IO Conditions Request",lambda: uplink(EPS.IORequest()),2,3)
     button(epsclayout,"Counter Check Request",lambda: uplink(EPS.CounterRequest()),2,4)
 
+    epsslayout = qt.QGridLayout()
+    
+    typesel2 = qt.QComboBox()
+    typesel2.addItems(['Select Component','Battery Bus', '5v Bus', 'Battery Charge 1', 'Battery Charge 2', 'Boost Boart', 'Out2', 'Out3', 'UHF', 'Out6', 'Heater 1', 'Heater 2', 'Heater 3' ])
+    epsslayout.addWidget(typesel2,1,2)
+
+    button(epsslayout,"Toggle Power To",lambda: EPS.ChangePower(EPS.PowerRequestHex(typesel2.currentText())),1,1)
+
+
     epslayout.addLayout(epsclayout)
+    epslayout.addLayout(epsslayout)
 
 
 
