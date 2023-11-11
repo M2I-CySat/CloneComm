@@ -40,7 +40,7 @@ global socket_rx
 
 # Basic Window Configuration
 app = qt.QApplication([])
-app.setStyle("Windows")
+#app.setStyle("Windows")
 window = qt.QWidget()
 window.setWindowTitle("CloneComm ZMQ")
 window.setFixedWidth(1000)
@@ -231,6 +231,7 @@ def rxtask(connected2):
                             print("Packet not recognized")
                     statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
                     log_output(statusmessage)
+                    log_output(str(messagerx.hex()))
                     if descramble==True:
                         print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
@@ -342,7 +343,7 @@ class button():
         global socket_tx
         self = qt.QPushButton(text)
         self.clicked.connect(command)
-        layout.addWidget(self,1,1)
+        layout.addWidget(self,x,y)
 
 
 
@@ -368,68 +369,108 @@ def main():
     PayloadTab = qt.QWidget()
     EOLTab = qt.QWidget()
 
-    # TCP Connect Tab
-    tcplayout = qt.QGridLayout()
-
+    # OBC Tab
+    obclayout = qt.QVBoxLayout()
+    obccomlayout=qt.QGridLayout()
     # b1 = qt.QPushButton("Ping Satellite")
     # b1.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True))) # Done
     # commandlayout.addWidget(b1,1,1)
-    button(commandlayout,"Ping Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True)),1,1)
+    button(obccomlayout,"Ping Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True)),1,1)
+    button(obccomlayout,"Request File List",lambda: uplink(cspp.makeCySatPacket("OBC","13",[], True, True, True)),1,2)
+    button(obccomlayout,"Restart Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","15",[], True, True, True)),1,3)
+    button(obccomlayout,"ADCS Health Check",lambda: uplink(cspp.makeCySatPacket("ADCS","09",[], True, True, True)),2,1)
+    button(obccomlayout,"EPS Health Check",lambda: uplink(cspp.makeCySatPacket("EPS","13",[], True, True, True)),2,2)
+    button(obccomlayout,"EPS Health Check",lambda: uplink(cspp.makeCySatPacket("UHF","23",[], True, True, True)),2,3)
+    obclayout.addLayout(obccomlayout)
+    # File Send Layout
+    sendlayout = qt.QGridLayout()
 
-    b2 = qt.QPushButton("ADCS TLE")
-    b2.clicked.connect(lambda: uplink(ADCS.TC_45)) # Done
-    commandlayout.addWidget(b2,1,2)
-    
-    b3 = qt.QPushButton("ADCS Time")
-    b3.clicked.connect(lambda: uplink(ADCS.TC_2)) # Done
-    commandlayout.addWidget(b3,1,3)
+    sendlayout.addWidget(qt.QLabel("File Downlink And Delete Controls"),1,2)
 
-    b4 = qt.QPushButton("ADCS Health Check")
-    b4.clicked.connect(lambda: uplink(cspp.makeCySatPacket("ADCS","09",[], True, True, True))) # Done
-    commandlayout.addWidget(b4,2,1)
 
-    b5 = qt.QPushButton("EPS Health Check")
-    b5.clicked.connect(lambda: uplink(cspp.makeCySatPacket("EPS","13",[], True, True, True))) # Done
-    commandlayout.addWidget(b5,2,2)
+    # File Delete Stuff
+    # Dropdown menu for file type
+    typesel2 = qt.QComboBox()
+    sendlayout.addWidget(qt.QLabel("Data Type"),2,2)
+    typesel2.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK'])
+    sendlayout.addWidget(typesel2,3,2)
 
-    b6 = qt.QPushButton("UHF Health Check")
-    b6.clicked.connect(lambda: uplink(cspp.makeCySatPacket("UHF","23",[], True, True, True))) # Done
-    commandlayout.addWidget(b6,2,3)
+    # Text box for file number
+    numsel2 = qt.QLineEdit("")
+    sendlayout.addWidget(qt.QLabel("File Number"),2,3)
+    sendlayout.addWidget(numsel2,3,3)
 
-    b8 = qt.QPushButton("Request File List")
-    b8.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","13",[], True, True, True))) # Done
-    commandlayout.addWidget(b8,1,4)
-
-    b9 = qt.QPushButton("Restart Satellite")
-    b9.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","15",[], True, True, True))) # Done
-    commandlayout.addWidget(b9,1,5)
+    # Send Button
+    button(sendlayout,"Delete File",lambda: uplink(cspp.makeCySatPacket("OBC","17",[["int",int(numsel2.text()),4],["int",get_datatype(typesel2.currentText()),4]], True, True, True)),3,4)
+    obclayout.addLayout(sendlayout)
 
     # Dropdown menu for file type
     typesel = qt.QComboBox()
-    commandlayout.addWidget(qt.QLabel("Data Type"),4,2)
+    sendlayout.addWidget(qt.QLabel("Data Type"),4,2)
     typesel.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK', 'TES'])
-    commandlayout.addWidget(typesel,5,2)
+    sendlayout.addWidget(typesel,5,2)
     
     # Text box for file number
     numsel = qt.QLineEdit("8")
-    commandlayout.addWidget(qt.QLabel("File Number"),4,3)
-    commandlayout.addWidget(numsel,5,3)
+    sendlayout.addWidget(qt.QLabel("File Number"),4,3)
+    sendlayout.addWidget(numsel,5,3)
+
     # Text box for start packet
     spsel = qt.QLineEdit("0")
-    commandlayout.addWidget(qt.QLabel("Start Packet"),4,4)
-    commandlayout.addWidget(spsel,5,4)
+    sendlayout.addWidget(qt.QLabel("Start Packet"),4,4)
+    sendlayout.addWidget(spsel,5,4)
     # Text box for end packet
     epsel = qt.QLineEdit("80")
-    commandlayout.addWidget(qt.QLabel("End Packet"),4,5)
-    commandlayout.addWidget(epsel,5,5)
+    sendlayout.addWidget(qt.QLabel("End Packet"),4,5)
+    sendlayout.addWidget(epsel,5,5)
+
+    # Send Button
+    button(sendlayout,"Retrieve File",lambda: uplink(cspp.makeCySatPacket("OBC","11",[["int",int(numsel.text()),4],["int",get_datatype(typesel.currentText()),4],["int",int(spsel.text()),4],["int",int(epsel.text()),4]], True, True, True)),5,5)
+    obclayout.addLayout(sendlayout)
+
+    # ADCS Tab
+    adcslayout = qt.QVBoxLayout()
+
+    adcsclayout = qt.QGridLayout()
+
+    button(adcsclayout,"Update TLEs",lambda: uplink(ADCS.TC_45()),1,1)
+    button(adcsclayout,"Update Time",lambda: uplink(ADCS.TC_2()),1,2)
+
+    adcsglayout = qt.QGridLayout()
+    # Telemetry Request
+
+    adcsglayout.addWidget(qt.QLabel("Telemetry Request Number"),0,2)
+    adcsglayout.addWidget(qt.QLabel("Output Data Length"),0,3)
+
+    numsel3 = qt.QLineEdit("140")
+    adcsglayout.addWidget(numsel3,1,2)
+    numsel3a = qt.QLineEdit("6")
+    adcsglayout.addWidget(numsel3a,1,3)
+    button(adcsglayout,"Telemetry Request",lambda: uplink(ADCS.TLM(int(numsel3.text()),int(numsel3a.text()))),1,1)
 
 
-    b7 = qt.QPushButton("Send File")
-    commandlayout.addWidget(qt.QLabel("Request large File"),4,1)
-    b7.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","11",[["int",int(numsel.text()),4],["int",get_datatype(typesel.currentText()),4],["int",int(spsel.text()),4],["int",int(epsel.text()),4]], True, True, True))) # Done?
-    commandlayout.addWidget(b7,5,1)
+    adcsglayout.addWidget(qt.QLabel("Command Number"),2,2)
+    adcsglayout.addWidget(qt.QLabel("Data (Hex)"),2,3)
+    numsel4 = qt.QLineEdit("10")
+    adcsglayout.addWidget(numsel4,3,2)
+    numsel5 = qt.QLineEdit("01")
+    adcsglayout.addWidget(numsel5,3,3)
+    button(adcsglayout,"Telecommand",lambda: uplink(ADCS.TC(int(numsel4.text()),numsel5.text())),3,1)
+
+    adcslayout.addLayout(adcsclayout)
+    adcslayout.addLayout(adcsglayout)
+
+
+    # EPS Tab
+
+    epslayout = qt.QVBoxLayout()
+
+
+
 
     # Combine tabs into one thing
+    OBCTab.setLayout(obclayout)
+    ADCSTab.setLayout(adcslayout)
     ctabs.addTab(OBCTab,"OBC")
     ctabs.addTab(ADCSTab,"ADCS")
     ctabs.addTab(EPSTab,"EPS")
@@ -451,7 +492,7 @@ def main():
     # TCP Connect Tab
     tcplayout = qt.QGridLayout()
 
-    ipbox = qt.QLineEdit("10.26.195.170")
+    ipbox = qt.QLineEdit("10.26.193.173")
     tcplayout.addWidget(qt.QLabel("Server IP"),1,1)
     tcplayout.addWidget(ipbox,1,2)
 

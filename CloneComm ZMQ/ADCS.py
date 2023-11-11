@@ -22,9 +22,16 @@ def endian_swap_double(invar):
 
     return outvar
 
+def TC(num,data):
+    return CSPP.makeCySatPacket("ADCS","01",[["int",num,1],["hex",data,1]], True, True, True)
+
+def TLM(num,out_byte):
+    return CSPP.makeCySatPacket("ADCS","03",[["int",num,1],["int",out_byte,1]], True, True, True)
+
 def TC_2():
     unixTimestamp = int(round(time.time()))
-    return CSPP.makeCySatPacket("ADCS","05",[["int",unixTimestamp,4],["int",0,2]], True, True, True)
+    return  CSPP.makeCySatPacket("ADCS","05",[["int",unixTimestamp,4],["int",0,2]], True, True, True)
+
 
 
 def TC_45():
