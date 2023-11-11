@@ -9,6 +9,7 @@ import descrambler
 import CSPP_generator as cspp
 import pmt
 import ADCS
+import EPS
 from os.path import exists
 
 
@@ -464,6 +465,18 @@ def main():
     # EPS Tab
 
     epslayout = qt.QVBoxLayout()
+    epsclayout = qt.QGridLayout()
+
+    button(epsclayout,"Pack Request",lambda: uplink(EPS.PackRequest()),1,1)
+    button(epsclayout,"X Panel Request",lambda: uplink(EPS.BusRequest()),1,2)
+    button(epsclayout,"Y Panel Request",lambda: uplink(EPS.BusRequest()),1,3)
+    button(epsclayout,"Z Panel Request",lambda: uplink(EPS.BusRequest()),1,4)
+    button(epsclayout,"Bus Request",lambda: uplink(EPS.BusRequest()),2,1)
+    button(epsclayout,"Temperature Request",lambda: uplink(EPS.TempRequest()),2,2)
+    button(epsclayout,"IO Conditions Request",lambda: uplink(EPS.IORequest()),2,3)
+    button(epsclayout,"Counter Check Request",lambda: uplink(EPS.CounterRequest()),2,4)
+
+    epslayout.addLayout(epsclayout)
 
 
 
@@ -471,6 +484,7 @@ def main():
     # Combine tabs into one thing
     OBCTab.setLayout(obclayout)
     ADCSTab.setLayout(adcslayout)
+    EPSTab.setLayout(epslayout)
     ctabs.addTab(OBCTab,"OBC")
     ctabs.addTab(ADCSTab,"ADCS")
     ctabs.addTab(EPSTab,"EPS")
