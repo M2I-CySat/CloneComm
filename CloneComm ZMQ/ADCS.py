@@ -23,7 +23,13 @@ def endian_swap_double(invar):
     return outvar
 
 def TC(num,data):
-    return CSPP.makeCySatPacket("ADCS","01",[["int",num,1],["hex",data,1]], True, True, True)
+    data = data.replace(" ","")
+    length=round(len(data)/2)+1
+    print("Data is "+str(length)+" long")
+    datanew = num+data
+    print(datanew)
+
+    return CSPP.makeCySatPacket("ADCS","01",[["int",length,1],["hex",datanew,length]], True, True, True)
 
 def TLM(num,out_byte):
     return CSPP.makeCySatPacket("ADCS","03",[["int",num,1],["int",out_byte,1]], True, True, True)

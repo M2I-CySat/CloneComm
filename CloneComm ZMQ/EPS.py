@@ -27,6 +27,8 @@ def CounterRequest():
     return CSPP.makeCySatPacket("EPS","0F",[], True, True, True)
 
 def PowerRequestHex(str):
+    print("PowerRequestHex")
+    print(str)
     match str:
         case "Battery Bus":
             return "01"
@@ -54,4 +56,6 @@ def PowerRequestHex(str):
             return "0F"
 
 def ChangePower(inval):
+    print("Attempting to switch power")
+    print(inval)
     return CSPP.makeCySatPacket("EPS","11",[["hex",inval,1]], True, True, True)

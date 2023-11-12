@@ -1,6 +1,7 @@
 import ax25_function as ax
 
 def appendData(inputBytearray, type, value, intbytecount = 1):
+    print("Appending data")
     match type:
         case "int":
             inputBytearray.extend(value.to_bytes(intbytecount, "little"))

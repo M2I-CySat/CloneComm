@@ -232,7 +232,7 @@ def rxtask(connected2):
                             print("Packet not recognized")
                     statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
                     log_output(statusmessage)
-                    log_output(str(messagerx.hex()))
+                    #log_output(str(messagerx.hex()))
                     if descramble==True:
                         print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
@@ -313,10 +313,16 @@ def rxtask(connected2):
 
 # Sends a message to CySat
 def uplink(message):
+    print("Attempting to uplink message")
     global socket_tx
     message_length = len(message)
+    print(int(message_length))
+    print(message)
     pdu = pmt.cons(pmt.PMT_NIL,pmt.init_u8vector(message_length,(message)))
-    socket_tx.send(pmt.serialize_str(pdu))
+    try:
+        socket_tx.send(pmt.serialize_str(pdu))
+    except:
+        print("Error")
 
 # I don't know but apparetly I had a good reason for this at one point
 def return_response(rx):
@@ -351,6 +357,8 @@ class button():
 def main():
     global connected
     global socket_tx
+
+    print(qt.QFont:StyleStrategy)
 
     # Setup the layouts
     mainlayout = qt.QVBoxLayout()
@@ -450,13 +458,13 @@ def main():
     button(adcsglayout,"Telemetry Request",lambda: uplink(ADCS.TLM(int(numsel3.text()),int(numsel3a.text()))),1,1)
 
 
-    adcsglayout.addWidget(qt.QLabel("Command Number"),2,2)
+    adcsglayout.addWidget(qt.QLabel("Command Number (Hex)"),2,2)
     adcsglayout.addWidget(qt.QLabel("Data (Hex)"),2,3)
-    numsel4 = qt.QLineEdit("10")
+    numsel4 = qt.QLineEdit("0A")
     adcsglayout.addWidget(numsel4,3,2)
     numsel5 = qt.QLineEdit("01")
     adcsglayout.addWidget(numsel5,3,3)
-    button(adcsglayout,"Telecommand",lambda: uplink(ADCS.TC(int(numsel4.text()),numsel5.text())),3,1)
+    button(adcsglayout,"Telecommand",lambda: uplink(ADCS.TC(numsel4.text(),numsel5.text())),3,1)
 
     adcslayout.addLayout(adcsclayout)
     adcslayout.addLayout(adcsglayout)
