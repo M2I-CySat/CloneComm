@@ -56,6 +56,7 @@ def PowerRequestHex(str):
             return "0F"
 
 def ChangePower(inval):
+    inval2 = PowerRequestHex(inval)
     print("Attempting to switch power")
     print(inval)
-    return CSPP.makeCySatPacket("EPS","11",[["hex",inval,1]], True, True, True)
+    return CSPP.makeCySatPacket("EPS","11",[["hex",inval2,1]], True, True, True)

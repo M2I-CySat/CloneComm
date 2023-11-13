@@ -9,6 +9,7 @@ def appendData(inputBytearray, type, value, intbytecount = 1):
             inputBytearray.extend(map(ord, value))
         case "hex":
             inputBytearray.extend(bytearray.fromhex(value))
+            print("Hex Append")
         case "bytearray":
             inputBytearray.extend(value)
 
@@ -54,7 +55,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
     fullcommand.extend(bytearray.fromhex(command))
     fullcommand.extend(dataLength)
     fullcommand.extend(tempdata)
-    
+    print("Past Initial Extends")
 
     # Temporary checksum
 
@@ -70,6 +71,7 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
     fullcommand.extend(checksum.to_bytes(1, 'big'))
         # //subtract from 0xFF
         # return 0xFF - byte;
+    print("Past checksum")
 
     # Zero replacement - UHF or something doesn't like 0x00s, so they are replacex with 5x 0xAA and re-replaced with 0x00 on the other end
     if replaceZeros:
@@ -80,14 +82,16 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
             else:
                 fullcommand2.append(fullcommand[i])
         fullcommand = fullcommand2
-    
-    #ax.display_bytearray_as_hex(fullcommand)
+    print("Past replace zeros")
+    ax.display_bytearray_as_hex(fullcommand)
     if doax == True:
         finalpacket = ax.makeAx25(srcCall, destCall, fullcommand, 'bytearray', dozeros)
     else:
         finalpacket = fullcommand
+    print("Past doax")
     f = open("Newly_Generated_CySat_Packet_For_Uplink.bin", "wb")
     f.write(finalpacket)
+    print("Returning final packet")
     return finalpacket
 
 # int, str, hex, then value, then byte count if int

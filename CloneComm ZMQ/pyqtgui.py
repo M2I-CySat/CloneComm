@@ -317,7 +317,7 @@ def uplink(message):
     global socket_tx
     message_length = len(message)
     print(int(message_length))
-    print(message)
+    #print(message)
     pdu = pmt.cons(pmt.PMT_NIL,pmt.init_u8vector(message_length,(message)))
     try:
         socket_tx.send(pmt.serialize_str(pdu))
@@ -357,8 +357,6 @@ class button():
 def main():
     global connected
     global socket_tx
-
-    print(qt.QFont:StyleStrategy)
 
     # Setup the layouts
     mainlayout = qt.QVBoxLayout()
@@ -487,10 +485,10 @@ def main():
     epsslayout = qt.QGridLayout()
     
     typesel2 = qt.QComboBox()
-    typesel2.addItems(['Select Component','Battery Bus', '5v Bus', 'Battery Charge 1', 'Battery Charge 2', 'Boost Boart', 'Out2', 'Out3', 'UHF', 'Out6', 'Heater 1', 'Heater 2', 'Heater 3' ])
+    typesel2.addItems(['Select Component','Battery Bus', '5v Bus', 'Battery Charge 1', 'Battery Charge 2', 'Boost Board', 'Out2', 'Out3', 'UHF', 'Out6', 'Heater 1', 'Heater 2', 'Heater 3' ])
     epsslayout.addWidget(typesel2,1,2)
 
-    button(epsslayout,"Toggle Power To",lambda: EPS.ChangePower(EPS.PowerRequestHex(typesel2.currentText())),1,1)
+    button(epsslayout,"Toggle Power To",lambda: uplink(EPS.ChangePower(typesel2.currentText())),1,1)
 
 
     epslayout.addLayout(epsclayout)
