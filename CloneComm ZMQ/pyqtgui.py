@@ -351,6 +351,11 @@ class button():
         self = qt.QPushButton(text)
         self.clicked.connect(command)
         layout.addWidget(self,x,y)
+class textbox():
+    def __init__(self, layout, label, default, x, y, xl, yl):
+        layout.addWidget(qt.QLabel(label),xl,yl)
+        self = qt.QLineEdit(default)
+        layout.addWidget(self, x, y)
 
 
 
@@ -495,12 +500,40 @@ def main():
     epslayout.addLayout(epsslayout)
 
 
+    # UHF Tab
+
+    uhflayout = qt.QVBoxLayout()
+
+    uhfclayout = qt.QGridLayout()
+    uhfslayout = qt.QGridLayout()
+
+    uhflayout.addLayout(uhfclayout)
+    uhflayout.addLayout(uhfslayout)
+
+
+    # Payload Tab
+
+    payloadlayout = qt.QVBoxLayout()
+
+    payloadclayout = qt.QGridLayout()
+    payloadslayout = qt.QGridLayout()
+
+    payloadlayout.addLayout(payloadclayout)
+    payloadlayout.addLayout(payloadslayout)
+
+    # EOL Tab
+    
+    eollayout = qt.QGridLayout()
+    eollayout.addWidget(qt.QLabel("EOL Stuff is a permanent disabling of the 3.3V bus and is TODO. May be password protected for safety."),1,1)
 
 
     # Combine tabs into one thing
     OBCTab.setLayout(obclayout)
     ADCSTab.setLayout(adcslayout)
     EPSTab.setLayout(epslayout)
+    UHFTab.setLayout(uhflayout)
+    PayloadTab.setLayout(payloadlayout)
+    EOLTab.setLayout(eollayout)
     ctabs.addTab(OBCTab,"OBC")
     ctabs.addTab(ADCSTab,"ADCS")
     ctabs.addTab(EPSTab,"EPS")
@@ -522,7 +555,7 @@ def main():
     # TCP Connect Tab
     tcplayout = qt.QGridLayout()
 
-    ipbox = qt.QLineEdit("10.26.193.173")
+    ipbox = qt.QLineEdit("10.26.193.7")
     tcplayout.addWidget(qt.QLabel("Server IP"),1,1)
     tcplayout.addWidget(ipbox,1,2)
 
