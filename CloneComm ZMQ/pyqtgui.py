@@ -192,6 +192,7 @@ def rxtask(connected2):
     global socket_tx
     global socket_rx
     global connected
+    directory = "C:\\Users\\joeuser\\Documents\\"
     filename = ""
     extension = ""
     packetIDs = [0]
@@ -230,7 +231,7 @@ def rxtask(connected2):
                             statusmessage+= "[EOL] "
                         case _:
                             print("Packet not recognized")
-                    statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
+                    #statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
                     log_output(statusmessage)
                     #log_output(str(messagerx.hex()))
                     if descramble==True:
@@ -281,7 +282,7 @@ def rxtask(connected2):
                         #         j += 1
 
                         # print current packet:
-                        filename = str(dataType) + extension
+                        filename = directory + str(dataType) + extension
                         if exists(filename):
                             f = open(filename, "r+b")
                         else:
@@ -437,7 +438,7 @@ def main():
     sendlayout.addWidget(epsel,5,5)
 
     # Send Button
-    button(sendlayout,"Retrieve File",lambda: uplink(cspp.makeCySatPacket("OBC","11",[["int",int(numsel.text()),4],["int",get_datatype(typesel.currentText()),4],["int",int(spsel.text()),4],["int",int(epsel.text()),4]], True, True, True)),5,5)
+    button(sendlayout,"Retrieve File",lambda: uplink(cspp.makeCySatPacket("OBC","11",[["int",int(numsel.text()),4],["int",get_datatype(typesel.currentText()),4],["int",int(spsel.text()),4],["int",int(epsel.text()),4]], True, True, True)),6,5)
     obclayout.addLayout(sendlayout)
 
     # ADCS Tab
