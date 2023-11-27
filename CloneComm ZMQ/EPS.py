@@ -3,7 +3,7 @@ import struct
 
 
 def PackRequest():
-    return CSPP.makeCySatPacket("EPS","01",[], True, True, True)
+    return CSPP.makeCySatPacket("EPS","15",[], True, True, True)
 
 def XRequest():
     return CSPP.makeCySatPacket("EPS","03",[], True, True, True)
@@ -21,7 +21,7 @@ def TempRequest():
     return CSPP.makeCySatPacket("EPS","0B",[], True, True, True)
 
 def IORequest():
-    return CSPP.makeCySatPacket("EPS","0D",[], True, True, True)
+    return CSPP.makeCySatPacket("EPS","17",[], True, True, True)
 
 def CounterRequest():
     return CSPP.makeCySatPacket("EPS","0F",[], True, True, True)
