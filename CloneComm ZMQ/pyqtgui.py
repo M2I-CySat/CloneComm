@@ -342,6 +342,8 @@ def get_datatype(str):
             return 3
         case "TES":
             return 4
+        case "MET":
+            return 5
 
 # Where the GUI is set up
 
@@ -405,7 +407,7 @@ def main():
     # Dropdown menu for file type
     typesel2 = qt.QComboBox()
     sendlayout.addWidget(qt.QLabel("Data Type"),2,2)
-    typesel2.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK'])
+    typesel2.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK', 'MET'])
     sendlayout.addWidget(typesel2,3,2)
 
     # Text box for file number
@@ -420,7 +422,7 @@ def main():
     # Dropdown menu for file type
     typesel = qt.QComboBox()
     sendlayout.addWidget(qt.QLabel("Data Type"),4,2)
-    typesel.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK', 'TES'])
+    typesel.addItems(['Select file type','DAT', 'KEL', 'LIS', 'HCK', 'TES', 'MET'])
     sendlayout.addWidget(typesel,5,2)
     
     # Text box for file number
