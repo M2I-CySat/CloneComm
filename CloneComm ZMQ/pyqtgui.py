@@ -38,13 +38,14 @@ global connected
 connected = False
 global socket_tx
 global socket_rx
+global fileTable
 
 # Basic Window Configuration
 app = qt.QApplication([])
 #app.setStyle("Windows")
 window = qt.QWidget()
 window.setWindowTitle("CloneComm ZMQ")
-window.setFixedWidth(1000)
+window.setFixedWidth(1250)
 window.setFixedHeight(600)
 
 # Setting up the logger early because bad things (might no longer?) happen if I don't
@@ -192,13 +193,12 @@ def rxtask(connected2):
     global socket_tx
     global socket_rx
     global connected
-    directory = "C:\\Users\\joeuser\\Documents\\"
+    global rowIdx
+    directory = "CloneComm ZMQ\\ignored_files\\"
     filename = ""
     extension = ""
     packetIDs = [0]
-    j = 0
-    filler = [0] * 113
-    filler = {0xAA}
+    missingIDs = [0]
     print(str(connected))
     while connected:
         try:
@@ -232,10 +232,8 @@ def rxtask(connected2):
                         case _:
                             print("Packet not recognized")
                     #statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
-                    log_output(statusmessage)
-                    #log_output(str(messagerx.hex()))
+                    #log_output(statusmessage)
                     if descramble==True:
-                        print("Packet descrambler goes here")
                         messagerx = messagerx[2:]
                         
                         #write current data:
@@ -265,22 +263,6 @@ def rxtask(connected2):
                                 extension = ".TXT"
                         dataType = int.from_bytes(data[4:7], byteorder="little")
 
-                        # check for missing packets out of order
-                        # check for missing packets:
-                        # if packetID > j:
-                        #     log_output("Packet missing")
-                        #     while packetID > j:
-                        #         # make a call to seek()
-                        #         # seek(113 * missing packet #)
-                        #         filename = str(dataType) + extension
-                        #         if exists(filename):
-                        #             f = open(filename, "ab")
-                        #         else:
-                        #             f = open(filename, "wb+")
-                        #         f.write(filler)
-                        #         f.close()
-                        #         j += 1
-
                         # print current packet:
                         filename = directory + str(dataType) + extension
                         if exists(filename):
@@ -291,25 +273,38 @@ def rxtask(connected2):
                         f.write(data[13:(data[12] + 13)])
                         f.close()
 
-                        #print("After descramble")
-                        #log_output("[PACKET RX]: "+str(data[13:(data[12] + 13)]))
-                        sum = 0
+                        # detect any packets missed:
                         i=0
                         while i < len(packetIDs):
-                            if i in packetIDs:
-                                a=1
-                            else:
-                                print("Packet #"+str(i)+" missing.")
-                                sum+=1
+                            if (i - 1) not in packetIDs:
+                                print("Packet #"+str(i - 1)+" missing.")
+                                if (i - 1) not in missingIDs:
+                                    missingIDs.append(i - 1)
                             i+=1
-                        #log_output("[PACKET RX]: "+str(data[13:data[12]+13]))
                         
                     break
         except zmq.Again as e:
             e=1
         time.sleep(0.01)
-        #log_output("Hello")
-        # put packet missing insertion here:
+
+    # add new row:
+    fileTable.setRowCount(fileTable.rowCount() + 1)
+    # file name:
+    fileTable.setItem(fileTable.rowCount() - 1, 0, qt.QTableWidgetItem(str(dataType) + extension))
+    # size of file in bytes:
+    totIDs = len(packetIDs)
+    fileTable.setItem(fileTable.rowCount() - 1, 1, qt.QTableWigdetItem(str(totIDs * 113)))
+    # size of file in packets:
+    fileTable.setItem(fileTable.rowCount() - 1, 2, qt.QTableWidgetItem(str(totIDs)))
+    idString = ""
+    # set up string containing all missing packets:
+    for i in range(len(missingIDs)):
+        if i > 0:
+            idString += ", "
+        
+        idString += missingIDs[i]
+    fileTable.setItem(fileTable.rowCount() - 1, 3, qt.QTableWidgetItem(idString))
+    
 
 
 # Sends a message to CySat
@@ -365,6 +360,7 @@ class textbox():
 def main():
     global connected
     global socket_tx
+    global fileTable
 
     # Setup the layouts
     mainlayout = qt.QVBoxLayout()
@@ -581,6 +577,18 @@ def main():
     tcptab.setLayout(tcplayout)
 
     # File Status Tab
+    filetabLayout = qt.QGridLayout()
+
+    fileTable = qt.QTableWidget()
+    fileTable.setRowCount(0)
+    fileTable.setColumnCount(4)
+    
+    headers = ['File Name', 'Size (B)', 'Size (packets)', 'Missing Files']
+    fileTable.setHorizontalHeaderLabels(headers)
+
+    filetabLayout.addWidget(fileTable)
+
+    filetab.setLayout(filetabLayout)
 
     # Pass Timing Tab
 
