@@ -194,7 +194,7 @@ def rxtask(connected2):
     global socket_rx
     global connected
     global rowIdx
-    directory = "CloneComm ZMQ\\ignored_files\\"
+    directory = 'ignored_files/'
     filename = ""
     extension = ""
     packetIDs = [0]
@@ -243,11 +243,13 @@ def rxtask(connected2):
                         # account for this packet being written:
                         packetID = int.from_bytes(data[8:11], byteorder="little")
                         print("Packet ID: "+str(packetID))
-                        
-                        j += 1
-                        print("Appending " + str(packetID) + " to list.")
-                        packetIDs.append(packetID)
-                        print("New item: " + str(packetIDs[j]))
+                        # j += 1
+                        # print("Appending " + str(packetID) + " to list.")
+                        if packetID in packetIDs:
+                            bob=1
+                        else:
+                            packetIDs.append(packetID)
+                        # print("New item: " + str(packetIDs[j]))
 
                         # generation extension and save data type:
                         match data[3]:
@@ -275,36 +277,40 @@ def rxtask(connected2):
 
                         # detect any packets missed:
                         i=0
-                        while i < len(packetIDs):
-                            if (i - 1) not in packetIDs:
-                                print("Packet #"+str(i - 1)+" missing.")
-                                if (i - 1) not in missingIDs:
-                                    missingIDs.append(i - 1)
+                        while i <= max(packetIDs):
+                            if i not in packetIDs:
+                                print("Packet #"+str(i)+" missing.")
+                                if i not in missingIDs:
+                                    missingIDs.append(i)
                             i+=1
-                        
+                    
+                    else:
+                        statusmessage+="[COMMAND: "+"{:02x}".format(messagerx[2])+"] [LENGTH: "+str(messagerx[3])+"]:\n[HEX]: "+(return_response(messagerx[4:-1]))+"\n"+"[STR]: "+(messagerx[4:-1]).decode("utf-8","replace")+"\n"
+                        log_output(statusmessage)
+
                     break
+
         except zmq.Again as e:
             e=1
         time.sleep(0.01)
 
-    # add new row:
-    fileTable.setRowCount(fileTable.rowCount() + 1)
-    # file name:
-    fileTable.setItem(fileTable.rowCount() - 1, 0, qt.QTableWidgetItem(str(dataType) + extension))
-    # size of file in bytes:
-    totIDs = len(packetIDs)
-    fileTable.setItem(fileTable.rowCount() - 1, 1, qt.QTableWigdetItem(str(totIDs * 113)))
-    # size of file in packets:
-    fileTable.setItem(fileTable.rowCount() - 1, 2, qt.QTableWidgetItem(str(totIDs)))
-    idString = ""
-    # set up string containing all missing packets:
-    for i in range(len(missingIDs)):
-        if i > 0:
-            idString += ", "
+    #  # add new row:
+    # fileTable.setRowCount(fileTable.rowCount() + 1)
+    # # file name:
+    # fileTable.setItem(fileTable.rowCount() - 1, 0, qt.QTableWidgetItem(str(dataType) + extension))
+    # # size of file in bytes:
+    # totIDs = len(packetIDs)
+    # fileTable.setItem(fileTable.rowCount() - 1, 1, qt.QTableWigdetItem(str(totIDs * 113)))
+    # # size of file in packets:
+    # fileTable.setItem(fileTable.rowCount() - 1, 2, qt.QTableWidgetItem(str(totIDs)))
+    # idString = ""
+    # # set up string containing all missing packets:
+    # for i in range(len(missingIDs)):
+    #     if i > 0:
+    #         idString += ", "
         
-        idString += missingIDs[i]
-    fileTable.setItem(fileTable.rowCount() - 1, 3, qt.QTableWidgetItem(idString))
-    
+    #     idString += missingIDs[i]
+    # fileTable.setItem(fileTable.rowCount() - 1, 3, qt.QTableWidgetItem(idString))
 
 
 # Sends a message to CySat
@@ -554,7 +560,7 @@ def main():
     # TCP Connect Tab
     tcplayout = qt.QGridLayout()
 
-    ipbox = qt.QLineEdit("10.26.193.7")
+    ipbox = qt.QLineEdit("10.26.196.142")
     tcplayout.addWidget(qt.QLabel("Server IP"),1,1)
     tcplayout.addWidget(ipbox,1,2)
 
