@@ -10,6 +10,7 @@ import CSPP_generator as cspp
 import pmt
 import ADCS
 import EPS
+import SDR
 from os.path import exists
 
 
@@ -188,7 +189,7 @@ def disconnect(connected2):
     return connected
 
 
-# The reception task. Handles incomiong packets from CySat.
+# The reception task. Handles incoming packets from CySat.
 def rxtask(connected2):
     global socket_tx
     global socket_rx
@@ -523,6 +524,15 @@ def main():
     payloadclayout = qt.QGridLayout()
     payloadslayout = qt.QGridLayout()
 
+    payloadslayout.addWidget(qt.QLabel("Duration (s)"),1,2)
+    payloadslayout.addWidget(qt.QLabel("Delay (s)"),1,3)
+    numsel6 = qt.QLineEdit("60")
+    payloadslayout.addWidget(numsel6,2,2)
+    numsel7 = qt.QLineEdit("30")
+    payloadslayout.addWidget(numsel7,2,3)
+
+    button(payloadslayout,"Take Measurement",lambda: uplink(SDR.TakeMeasurement(int(numsel6.text()), int(numsel7.text()))),2,1)
+
     payloadlayout.addLayout(payloadclayout)
     payloadlayout.addLayout(payloadslayout)
 
@@ -560,7 +570,7 @@ def main():
     # TCP Connect Tab
     tcplayout = qt.QGridLayout()
 
-    ipbox = qt.QLineEdit("10.26.196.142")
+    ipbox = qt.QLineEdit("10.50.66.225")
     tcplayout.addWidget(qt.QLabel("Server IP"),1,1)
     tcplayout.addWidget(ipbox,1,2)
 

@@ -1,4 +1,3 @@
-import math
 import crcmod
 import crcmod.predefined
 import sys
@@ -6,17 +5,21 @@ import sys
 # With blood, sweat, and tears, by Steven Scheuermann
 # With assistance from Henry Shires, Vanessa Whitehead, and Manas Mathur
 
+# The main function, makeAx25(), takes in a payload and outputs a bytearray containing the Endurosat packet which contains that payload.
+# There are a few other helper functions related to weird bit/byte conversions I had to do because Python doesn't have built in functions for that
 
-# Ground station is KB0MGQ, satellite is W0ISU. Make sure to add spaces to bring this up to six characters.
-# Callsigns are temporarily reversed for match testing.
+
+
+
+# For CySat, Ground station is KB0MGQ, satellite is W0ISU. Make sure to add spaces to bring this up to six characters.
 srcCall = "KB0MGQ"
 destCall = "W0ISU "
 # The contents of the AX.25 packet. This will eventually be a function argument when this is made into a function.
-informationField = "I hate Endurosat screw this"
+informationField = "Why is this so difficult"
 
 sys.set_int_max_str_digits(100000)
 
-
+# Takes a string of bits ("0101010") and converts it to a bytes object
 def bitstring_to_bytes(s):
     v = int(s, 2)
     b = bytearray()
@@ -25,8 +28,7 @@ def bitstring_to_bytes(s):
         v >>= 8
     return bytes(b[::-1])
 
-
-# CRITICAL BUG: Hex byte 0x03 00000011 will be printed as 0x30 00110000, so it has a problem with leading zeros
+# Takes a string of bits ("0101000110") and converts it to a bytearray, but left justified
 def bitstring_to_bytes_but_left_justified(bits):
     bytes = [bits[i:i+8] for i in range(0, len(bits), 8)]
     exitstring = ""
@@ -37,7 +39,7 @@ def bitstring_to_bytes_but_left_justified(bits):
     # print(exitstring)
     return (bytearray.fromhex(exitstring))
 
-
+# Prints a string ("Hello World") as hex for debug purposes
 def display_string_as_hex(thestring):
     fullstring = ""
     for i in range(0, len(thestring)-1):
@@ -46,7 +48,7 @@ def display_string_as_hex(thestring):
         fullstring = fullstring+(" ")
     print(fullstring)
 
-
+# Prints a bytearray as hex for debug purposes
 def display_bytearray_as_hex(thestring):
     fullstring = ""
     for i in range(0, len(thestring)):
@@ -56,7 +58,7 @@ def display_bytearray_as_hex(thestring):
         fullstring = fullstring+(" ")
     print(fullstring)
 
-
+# Prints a bytearray as hex with no spaces for debug purposes
 def display_bytearray_as_hex_no_spaces(thestring):
     fullstring = ""
     for i in range(0, len(thestring)):
@@ -66,7 +68,7 @@ def display_bytearray_as_hex_no_spaces(thestring):
         # fullstring=fullstring+(" ")
     print(fullstring)
 
-
+# Converts a bytearray into hex
 def return_bytearray_as_hex(thestring):
     fullstring = ""
     for i in range(0, len(thestring)):
@@ -76,6 +78,7 @@ def return_bytearray_as_hex(thestring):
         # fullstring=fullstring+(" ")
     return (fullstring)
 
+# Converts a bytearray into hex with spaces
 def return_bytearray_as_hex_spaces(thestring):
     fullstring = ""
     for i in range(0, len(thestring)):
@@ -85,6 +88,17 @@ def return_bytearray_as_hex_spaces(thestring):
         fullstring=fullstring+(" ")
     return (fullstring)
 
+"""
+Makes an Ax.25 packet
+Parameters:
+    :param srcCall - Six character all caps string - radio callsign for the groundstation (Ex: "KB0MGQ") (Ensure that there are six characters, add spaces if your callsigns are shorter than 6 characters)
+    :param destCall - Six character all caps string - radio callsign for the satellite (Ex: "W0ISU ") (Ensure that there are six characters, add spaces if your callsigns are shorter than 6 characters)
+    :param informationField - ascii string or bytearray depending on ecoding - the payload of the Ax.25 packet. Can be an ascii string (Ex: "Hello World") or a bytearray (Ex: make a bytearray and extend it as needed, can do non ascii characters")
+    :param encoding - string - 'ascii' or 'bytearray', determines the format of informationField
+    :param dozeros - boolean - whether or not the output should be prepended and postpended by a lot of zeros. It should help improve packet detection if the radios on either end have a tendency to cut off the start and end of transmissions.
+Returns:
+    A bytearray containing the Ax.25
+"""
 
 def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
@@ -95,7 +109,7 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     # Destination Address
 
     # Convert the destination callsign to bits
-    destBits = ''.join(format(ord(x), '08b') for x in destCall)
+    destBits = ''.join(format(ord(x), '08b') for x in destCall) # Why isn't there a better Python function to convert to bits
 
     # Leftshift the bits because the format requires it
     destBitsLshift = (int(destBits, 2) << 1)
@@ -118,7 +132,7 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     axlayer.extend(bitstring_to_bytes(srcBitsLshift2))
 
     # SSID
-    # SSID is E1 instead of E0 for this one, I think the 1 at the end is the 1 we were bitshifting everything left for and the E is a predefined consequence of that
+    # SSID is E1 instead of E0 for this one, I think the 1 at the end is the 1 we were bitshifting everything left for and the E is a predefined consequence of that.
     axlayer.extend(bytearray.fromhex("E1"))
 
     # Control
@@ -129,9 +143,11 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
     # Information Field
     if encoding == 'ascii':
+        # Converts ascii input to bytearray if the information field is a string
         informationField_in_hex = bytearray(informationField, 'ascii')
         axlayer.extend(informationField_in_hex)
     elif encoding == 'bytearray':
+        # Adds information field to the bytearray if the information field is already a bytearray
         axlayer.extend(informationField)
 
     # CRC-16
@@ -140,12 +156,12 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     crc16_function = crcmod.predefined.mkPredefinedCrcFun('x-25')
     crc_value = crc16_function(axlayer)
 
-    # However we need to swap the order of the bytes
+    # However we need to swap the order of the bytes (this is ugly and I could have done it easier but this works)
     crc_value_full = bytearray.fromhex(
         str(hex(crc_value))[4:6].zfill(2)+str(hex(crc_value))[2:4].zfill(2))
     axlayer.extend(crc_value_full)
 
-    # Yay! The whole ax.25 part is done now!
+    # Yay! The whole Ax.25 part is done now!
 
     # Next up is the HDLC step. The first thing we need to to is reverse the order of the bits in each byte.
 
@@ -190,7 +206,7 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
     # I am the pi-rate, master of the seven E's
 
-    # Okay so we were going to do scrambling in GNU but I'm having issues as the GNU scrambled adds 17 bytes to the beginning
+    # Okay so we were going to do scrambling in GNU Radio but I'm having issues as the GNU scrambled adds 17 bits to the beginning
     # Scrambling is a mathematical process that basically randomizes the data
     # In this case, the current bit is the EXOR of the current bit plus the bits transmitted 12 and 17 bits earlier
     # This scrambling thing self synchronizes somehow so the exact seed doesn't matter
@@ -216,7 +232,7 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
     # We might have to remove the very last byte I'm not sure
     # I won't do that for now but I will probably do that later
-    # But if we just arbitrarily chop off the last byte then if it was already only 8 long then we chopped off a good byte, make sue to check if it is a whole number of bytes first
+    # But if we just arbitrarily chop off the last byte then if it was already only 8 long then we chopped off a good byte, make sure to check if it is a whole number of bytes first
     # I prbably don't have to remove it
     # But I might
     # This project I swear
@@ -246,8 +262,6 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
 
     Data_Field_2_Bytes = bitstring_to_bytes_but_left_justified(NRZIstring)
     # display_bytearray_as_hex_no_spaces(payloadBytes)
-
-    # Note to future self this comes out offset. You might need to manually implement scrambling and NZRI.
 
     # This *should* be the proper ax.25 stuff. Now to wrap it in an endurosat packet.
 
@@ -297,3 +311,4 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     #print("Hex bytes: ", end="")
     #display_bytearray_as_hex(withzeros)
     return withzeros
+
