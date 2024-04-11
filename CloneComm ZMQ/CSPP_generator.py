@@ -91,8 +91,8 @@ def makeCySatPacket(subsystem, command, data, dozeros, doax, replaceZeros, srcCa
     else:
         finalpacket = fullcommand
     print("Past doax")
-    f = open("Newly_Generated_CySat_Packet_For_Uplink.bin", "wb")
-    f.write(finalpacket)
+    #f = open("Newly_Generated_CySat_Packet_For_Uplink.bin", "wb") // Uncomment for output of the binary packet file
+    #f.write(finalpacket)
     print("Returning final packet")
     return finalpacket
 
