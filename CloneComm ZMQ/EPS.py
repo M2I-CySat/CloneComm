@@ -32,8 +32,8 @@ def PowerRequestHex(str):
     match str:
         case "Battery Bus":
             return "01"
-        case "5v Bus":
-            return "04"
+        # case "5v Bus":
+        #     return "04"
         case "Battery Charge 1":
             return "06"
         case "Battery Charge 2":
@@ -44,8 +44,8 @@ def PowerRequestHex(str):
             return "09"
         case "Out3":
             return "0A"
-        case "UHF":
-            return "0B"
+        # case "UHF":
+        #     return "0B"
         case "Out6":
             return "0C"
         case "Heater 1":

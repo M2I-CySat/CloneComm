@@ -198,8 +198,9 @@ def rxtask(connected2):
     directory = 'ignored_files/'
     filename = ""
     extension = ""
-    packetIDs = [0]
+    packetIDs = [0] # Critical that we find a way to do this per file
     missingIDs = [0]
+    currentfile = ""
     print(str(connected))
     while connected:
         try:
@@ -246,10 +247,10 @@ def rxtask(connected2):
                         print("Packet ID: "+str(packetID))
                         # j += 1
                         # print("Appending " + str(packetID) + " to list.")
-                        if packetID in packetIDs:
-                            bob=1
-                        else:
-                            packetIDs.append(packetID)
+                        # if packetID in packetIDs:
+                        #     bob=1
+                        # else:
+                        #     packetIDs.append(packetID)
                         # print("New item: " + str(packetIDs[j]))
 
                         # generation extension and save data type:
@@ -262,12 +263,47 @@ def rxtask(connected2):
                                 extension = ".LIS"
                             case 0x03:
                                 extension = ".HCK"
+                            case 0x04:
+                                extension = ".TES"
+                            case 0x05:
+                                extension = ".MET"
+                            case 0x06:
+                                extension = ".UHF_HCK"
+                            case 0x07:
+                                extension = ".EPS_HCK"
+                            case 0x08:
+                                extension = ".ADCS_HCK"
                             case _:
                                 extension = ".TXT"
                         dataType = int.from_bytes(data[4:7], byteorder="little")
 
                         # print current packet:
                         filename = directory + str(dataType) + extension
+
+                        if filename == currentfile:
+                            dave9=0
+                        else:
+                            missingstring = ""
+                            while i <= max(packetIDs):
+                                if i not in packetIDs:
+                                    print("Packet #"+str(i)+" missing.")
+                                    if i not in missingIDs:
+                                        missingstring = missingstring + str(id)+" "
+                                i+=1
+                            print("Preivious file: "+filename+". Missing packets: "+missingstring)
+                            log_output("Preivious file: "+filename+". Missing packets: "+missingstring)
+                            currentfile = filename
+                            print("Now receiving "+currentfile)
+                            log_output("Now receiging "+currentfile)
+                            packetIDs = [0] # Hack way to make new files have reset missing ids but not persistent or very good
+                            missingIDs = [0]
+                            missingstring = ""
+
+                        if packetID in packetIDs:
+                            bob=1
+                        else:
+                            packetIDs.append(packetID)
+
                         if exists(filename):
                             f = open(filename, "r+b")
                         else:
@@ -398,12 +434,19 @@ def main():
     button(obccomlayout,"Restart Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","15",[], True, True, True)),1,3)
     button(obccomlayout,"ADCS Health Check",lambda: uplink(cspp.makeCySatPacket("ADCS","09",[], True, True, True)),2,1)
     button(obccomlayout,"EPS Health Check",lambda: uplink(cspp.makeCySatPacket("EPS","13",[], True, True, True)),2,2)
-    button(obccomlayout,"EPS Health Check",lambda: uplink(cspp.makeCySatPacket("UHF","23",[], True, True, True)),2,3)
+    button(obccomlayout,"UHF Health Check",lambda: uplink(cspp.makeCySatPacket("UHF","23",[], True, True, True)),2,3)
+
+    button(obccomlayout,"All Health Checks",lambda: uplink(cspp.makeCySatPacket("OBC","19",[], True, True, True)),3,1)
+    numselFile = qt.QLineEdit("0")
+    obccomlayout.addWidget(numselFile,3,3)
+    button(obccomlayout,"Uplink New File Number: ",lambda: uplink(cspp.makeCySatPacket("OBC","23",[["int",int(numselFile.text()),2]], True, True, True)),3,2)
+
     obclayout.addLayout(obccomlayout)
     # File Send Layout
     sendlayout = qt.QGridLayout()
 
     sendlayout.addWidget(qt.QLabel("File Downlink And Delete Controls"),1,2)
+    button(sendlayout,"Downlink All Files Twice",lambda: uplink(cspp.makeCySatPacket("OBC","21",[], True, True, True)),6,2)
 
 
     # File Delete Stuff
@@ -496,7 +539,7 @@ def main():
     epsslayout = qt.QGridLayout()
     
     typesel2 = qt.QComboBox()
-    typesel2.addItems(['Select Component','Battery Bus', '5v Bus', 'Battery Charge 1', 'Battery Charge 2', 'Boost Board', 'Out2', 'Out3', 'UHF', 'Out6', 'Heater 1', 'Heater 2', 'Heater 3' ])
+    typesel2.addItems(['Select Component','Battery Bus', 'Battery Charge 1', 'Battery Charge 2', 'Boost Board', 'Out2', 'Out3', 'Out6', 'Heater 1', 'Heater 2', 'Heater 3' ])
     epsslayout.addWidget(typesel2,1,2)
 
     button(epsslayout,"Toggle Power To",lambda: uplink(EPS.ChangePower(typesel2.currentText())),1,1)
@@ -526,12 +569,15 @@ def main():
 
     payloadslayout.addWidget(qt.QLabel("Duration (s)"),1,2)
     payloadslayout.addWidget(qt.QLabel("Delay (s)"),1,3)
+    payloadslayout.addWidget(qt.QLabel("TESfile ID"),1,4)
     numsel6 = qt.QLineEdit("60")
     payloadslayout.addWidget(numsel6,2,2)
     numsel7 = qt.QLineEdit("30")
     payloadslayout.addWidget(numsel7,2,3)
+    numsel8 = qt.QLineEdit("18")
+    payloadslayout.addWidget(numsel8, 2, 4)
 
-    button(payloadslayout,"Take Measurement",lambda: uplink(SDR.TakeMeasurement(int(numsel6.text()), int(numsel7.text()))),2,1)
+    button(payloadslayout,"Take Measurement",lambda: uplink(SDR.TakeMeasurement(int(numsel6.text()), int(numsel7.text()), int(numsel8.text()))),2,1)
 
     payloadlayout.addLayout(payloadclayout)
     payloadlayout.addLayout(payloadslayout)
@@ -539,7 +585,8 @@ def main():
     # EOL Tab
     
     eollayout = qt.QGridLayout()
-    eollayout.addWidget(qt.QLabel("EOL Stuff is a permanent disabling of the 3.3V bus and is TODO. May be password protected for safety."),1,1)
+    eollayout.addWidget(qt.QLabel("EOL Stuff is a permanent disabling of the 3.3V and 5V buses.\nIf you don't see a button, it is commented out in the code.\nDo not uncomment or press until you want to permanently disable CySat."),1,1)
+    button(eollayout, "KILL CYSAT",lambda: uplink(cspp.makeCySatPacket("OBC","25",[], True, True, True)),2,1)
 
 
     # Combine tabs into one thing
