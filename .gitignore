@@ -4,3 +4,4 @@ tempCodeRunnerFile.py
 ignored_files
 CloneComm ZMQ/Newly_Generated_CySat_Packet_For_Uplink.bin
 CloneComm ZMQ/Newly_Generated_CySat_Packet_For_Uplink.bin
+*.bin
