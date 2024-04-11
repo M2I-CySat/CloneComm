@@ -4,7 +4,9 @@ def appendData(inputBytearray, type, value, intbytecount = 1):
     print("Appending data")
     match type:
         case "int":
+            print("Appending int "+str(value))
             inputBytearray.extend(value.to_bytes(intbytecount, "little"))
+            ax.display_bytearray_as_hex(inputBytearray)
         case "str":
             inputBytearray.extend(map(ord, value))
         case "hex":

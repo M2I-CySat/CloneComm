@@ -36,6 +36,7 @@ def TLM(num,out_byte):
 
 def TC_2():
     unixTimestamp = int(round(time.time()))
+    print("Timestamp "+str(unixTimestamp))
     return  CSPP.makeCySatPacket("ADCS","05",[["int",unixTimestamp,4],["int",0,2]], True, True, True)
 
 
@@ -97,3 +98,5 @@ def TC_45():
     CSPP.ax.display_bytearray_as_hex(output)
 
     return CSPP.makeCySatPacket("ADCS","07",[["bytearray", output,"blah"]], True, True, True) #TODO: Make command number real number
+
+TC_2()
