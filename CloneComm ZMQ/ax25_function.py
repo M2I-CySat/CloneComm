@@ -312,3 +312,116 @@ def makeAx25(srcCall, destCall, informationField, encoding, dozeros):
     #display_bytearray_as_hex(withzeros)
     return withzeros
 
+
+def decode_ax25(in_bytearray):
+
+    # Convert to string for bit operations
+    axstring = return_bytearray_as_hex(in_bytearray)
+    axbits = bin(int(axstring, 16))[2:].zfill(8)
+    #print(axbits)
+    prevstate = "0"
+    currentstate = "0"  # Start off at low state. A 1 is a high state
+    NRZIstring = ""
+
+    for i in range(0, len(axbits)):
+        currentstate = axbits[i]
+        if currentstate == prevstate:
+            # No change, is a 1
+            NRZIstring+="1"
+        else:
+            # Change, is a 0
+            NRZIstring = NRZIstring + "0"
+        prevstate = currentstate
+
+    # Convert back to bytes
+
+    Data_Field_2_Bytes = bitstring_to_bytes_but_left_justified(NRZIstring)
+
+    # Descrambling
+
+    descrambled = [0] * len(Data_Field_2_Bytes)
+    descrambledByte = 0
+    lfsr = 0b00000000000000000000000000000000
+    arr = bytearray(Data_Field_2_Bytes)
+    #start descrambling:
+    for i in range(len(descrambled)):
+        for j in range(8):
+            curbit = (arr[i] >> (7-j)) & 1
+            lfsr = ((lfsr << 1) | curbit)
+            X12 = (lfsr >> 12) & 1
+            X17 = (lfsr >> 17) & 1
+            outbit = ((curbit) ^ ((X12 ^ X17))) & 1
+            descrambledByte = (descrambledByte << 1) | outbit
+        descrambled[i] = descrambledByte
+        #print("Byte "+str(i)+" Int "+str(int(descrambledByte))+" Str "+str(descrambledByte))
+        descrambledByte = 0
+    #print("Done descrambling")
+    descrambled = bytearray(descrambled)
+
+
+    # Strip first 3 non 7E bytes and last bytes except the one that doesn't matter ahhh
+    stripped = descrambled[3:]
+    while stripped[0] == 0x7E:
+        stripped = stripped[1:]
+    endhex = stripped[-1]
+    while stripped[-1] == endhex:
+        stripped = stripped[:-1]
+
+    #display_bytearray_as_hex(stripped)
+
+    # Conver to string again
+    stripped = return_bytearray_as_hex(stripped)
+    stripped = bin(int(stripped, 16))[2:].zfill(8)
+    #print(stripped)
+    # De-bit stuff
+
+    onescounter = 0
+    destuffedbits = "0" # Should stert with 1 for reasons
+    for i in range(0, len(stripped)):
+        if stripped[i] == "1":
+            onescounter = onescounter+1
+        else:
+            onescounter = 0
+        if onescounter == 5:
+            #stuffedbits = stuffedbits+"0"
+            onescounter = 0
+        else:
+            destuffedbits = destuffedbits+stripped[i]
+    #destuffedbits = destuffedbits[:128]+destuffedbits[129:]
+    #print(destuffedbits)
+
+    # Reverse order of bits in each byte
+    axstring = bitstring_to_bytes_but_left_justified(destuffedbits)
+    axstring = return_bytearray_as_hex(axstring)
+    # axbits=''.join(format(ord(x), '08b') for x in axstring)
+    axbits = bin(int(axstring, 16))[2:].zfill(8)
+
+    axbytes = [axbits[i:i+8] for i in range(0, len(axbits), 8)]
+    reversedbits = ""
+    for i in range(0, len(axbytes)):
+        reversedbits += axbytes[i][::-1]
+
+    callsigns = "0"+reversedbits[:112]
+    callsigns = bitstring_to_bytes_but_left_justified(callsigns)
+    #display_bytearray_as_hex(callsigns)
+
+    
+    reversedbits = bitstring_to_bytes_but_left_justified(reversedbits)
+    #reversedbits = return_bytearra
+    totalstring = bytearray(callsigns[0:6])
+    twenty = bytearray.fromhex("20")
+    totalstring.extend(twenty)
+    totalstring.extend(callsigns[7:13])
+    totalstring.extend(twenty)
+    totalstring.extend(reversedbits[16:-3])
+    #totalstring = callsigns[1:6]+0x20+callsigns[8:13]+0x20+reversedbits[14:]
+    totalstring=totalstring.decode("utf-8","replace")
+
+    totalstring = reversedbits.decode("utf-8","replace")
+    #print(totalstring)
+    #display_bytearray_as_hex(reversedbits)
+    return totalstring
+
+#testarray = bytearray.fromhex("FEF16E90A0BCA56AFAFE463584B65A6E788190B50FA3D2399AAB0381E1B08FB4E4FA59BCEF7EE435692242D1540EF0D7CAA8F0")
+
+#decode_ax25(testarray)

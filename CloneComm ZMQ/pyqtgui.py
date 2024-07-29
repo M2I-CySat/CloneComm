@@ -11,6 +11,7 @@ import pmt
 import ADCS
 import EPS
 import SDR
+import ax25_function as AX
 from os.path import exists
 
 
@@ -326,7 +327,16 @@ def rxtask(connected2):
                         log_output(statusmessage)
 
                     break
-
+                #else:
+            # try:
+            #     print("Trying")
+            #     dave = AX.decode_ax25(messagerx)
+            #     log_output("This is probably a beacon: "+dave),
+            # except:
+            #     a=1
+            #         #except Exception as e: print(e)
+            #             #print("Did not work")
+                    
         except zmq.Again as e:
             e=1
         time.sleep(0.01)
@@ -586,7 +596,7 @@ def main():
     
     eollayout = qt.QGridLayout()
     eollayout.addWidget(qt.QLabel("EOL Stuff is a permanent disabling of the 3.3V and 5V buses.\nIf you don't see a button, it is commented out in the code.\nDo not uncomment or press until you want to permanently disable CySat."),1,1)
-    button(eollayout, "KILL CYSAT",lambda: uplink(cspp.makeCySatPacket("OBC","25",[], True, True, True)),2,1)
+    #button(eollayout, "KILL CYSAT",lambda: uplink(cspp.makeCySatPacket("OBC","25",[], True, True, True)),2,1)
 
 
     # Combine tabs into one thing

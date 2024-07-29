@@ -73,16 +73,29 @@ def TC_45():
     AOP = double_to_hex(float(values[14]))
 
 
-
     bstarexp = float(values[6][-2:])
     bstarbase = float("0."+values[6][:5])
     bstar = bstarbase*(10**bstarexp)
     bstar = double_to_hex(bstar)
     meanmotion = double_to_hex(float(values[16][:-2]))
     meananomaly = double_to_hex(float(values[15]))
+    print(meanmotion)
+    if len(str(meanmotion))%2 !=0:
+        meanmotion = "0x0"+meanmotion[2:]
+    print(meanmotion)
     Epoch = double_to_hex(float(values[3]))
 
     output = bytearray()
+    print(Inclination)
+    print(Eccentricity)
+    print(RAAN)
+    print(AOP)
+    print(bstar)
+    print(meanmotion)
+    print(meananomaly)
+    print(Epoch)
+
+
 
     output.extend(bytearray.fromhex(Inclination[2:]))
     output.extend(bytearray.fromhex(Eccentricity[2:]))
