@@ -11,7 +11,7 @@ options:
     gen_linking: dynamic
     generate_options: qt_gui
     hier_block_src_path: '.:'
-    id: sat_downlink_uplink
+    id: sat_downlink_uplink_fall2024
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -92,6 +92,18 @@ blocks:
     bus_structure: null
     coordinate: [184, 12]
     rotation: 0
+    state: disabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '1000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [672, 16.0]
+    rotation: 0
     state: enabled
 - name: blocks_file_sink_0
   id: blocks_file_sink
@@ -100,7 +112,7 @@ blocks:
     alias: ''
     append: 'False'
     comment: ''
-    file: /home/cysat-radio/Desktop/CloneComm/SatLink/Packets/packets822.txt
+    file: /home/groundstation/CloneComm/GNU Radio Files/Packets/packets822.txt
     type: byte
     unbuffered: 'True'
     vlen: '1'
@@ -108,7 +120,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [992, 308.0]
+    coordinate: [1000, 312.0]
     rotation: 0
     state: enabled
 - name: blocks_file_source_0
@@ -118,21 +130,43 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /home/cysat-radio/Desktop/CloneComm/Newly_Generated_CySat_Packet_For_Uplink
+    file: /home/groundstation/CloneComm/Newly_Generated_CySat_Packet_For_Uplink.bin
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
     offset: '0'
-    repeat: 'False'
+    repeat: 'True'
     type: byte
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [120, 412.0]
+    coordinate: [8, 432.0]
     rotation: 0
-    state: enabled
+    state: disabled
+- name: blocks_file_source_0_0
+  id: blocks_file_source
+  parameters:
+    affinity: ''
+    alias: ''
+    begin_tag: pmt.PMT_NIL
+    comment: ''
+    file: /home/groundstation/CloneComm/Newly_Generated_CySat_Packet_For_Uplink.bin
+    length: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    repeat: 'True'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 280.0]
+    rotation: 0
+    state: disabled
 - name: blocks_message_debug_0
   id: blocks_message_debug
   parameters:
@@ -145,9 +179,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [760, 376.0]
+    coordinate: [784, 336.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_message_debug_0_0
   id: blocks_message_debug
   parameters:
@@ -160,9 +194,41 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1208, 552.0]
+    coordinate: [1216, 536.0]
     rotation: 0
     state: enabled
+- name: blocks_message_debug_0_0_0
+  id: blocks_message_debug
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    en_uvec: 'True'
+    log_level: info
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [408, 664.0]
+    rotation: 0
+    state: enabled
+- name: blocks_message_strobe_0
+  id: blocks_message_strobe
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    msg: ' pmt.cons(pmt.PMT_NIL, pmt.make_u8vector(16, 0xFF))'
+    period: '10'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [256, 352.0]
+    rotation: 0
+    state: disabled
 - name: digital_gfsk_mod_0
   id: digital_gfsk_mod
   parameters:
@@ -181,7 +247,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [328, 428.0]
+    coordinate: [352, 448.0]
     rotation: 0
     state: enabled
 - name: network_socket_pdu_0
@@ -194,14 +260,14 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     mtu: '10000'
-    port: '52001'
+    port: '5556'
     tcp_no_delay: 'False'
     type: UDP_SERVER
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [760, 228.0]
+    coordinate: [592, 120.0]
     rotation: 0
     state: enabled
 - name: pdu_pdu_to_stream_x_0
@@ -219,7 +285,25 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [760, 324.0]
+    coordinate: [792, 256.0]
+    rotation: 0
+    state: enabled
+- name: pdu_pdu_to_stream_x_1
+  id: pdu_pdu_to_stream_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    depth: '64'
+    early_behavior: pdu.EARLY_BURST_APPEND
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: byte
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [176, 592.0]
     rotation: 0
     state: enabled
 - name: rational_resampler_xxx_1
@@ -249,7 +333,7 @@ blocks:
     alias: ''
     comment: ''
     definition: file
-    file: /home/cysat-radio/Desktop/CloneComm/SatLink/CYSAT.yml
+    file: /home/groundstation/CloneComm/GNU Radio Files/CYSAT.yml
     iq: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -262,6 +346,49 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [408, 244.0]
+    rotation: 0
+    state: enabled
+- name: soapy_hackrf_sink_0
+  id: soapy_hackrf_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: 'False'
+    bandwidth: '0'
+    center_freq: center_freq
+    comment: ''
+    dev_args: ''
+    samp_rate: samp_rate
+    type: fc32
+    vga: '16'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [840, 728.0]
+    rotation: 0
+    state: disabled
+- name: soapy_hackrf_source_0
+  id: soapy_hackrf_source
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: 'False'
+    bandwidth: '0'
+    center_freq: center_freq
+    comment: ''
+    dev_args: ''
+    gain: '16'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: fc32
+    vga: '16'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [240, 88.0]
     rotation: 0
     state: enabled
 - name: uhd_usrp_sink_0
@@ -365,7 +492,7 @@ blocks:
     center_freq7: '0'
     center_freq8: '0'
     center_freq9: '0'
-    clock_rate: 0e0
+    clock_rate: 120e6
     clock_source0: ''
     clock_source1: ''
     clock_source2: ''
@@ -375,7 +502,7 @@ blocks:
     clock_source6: ''
     clock_source7: ''
     comment: ''
-    dev_addr: '""'
+    dev_addr: ''
     dev_args: ''
     gain0: '0'
     gain1: '0'
@@ -546,7 +673,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    ant0: '"RX2"'
+    ant0: '"TX/RX"'
     ant1: '"RX2"'
     ant10: '"RX2"'
     ant11: '"RX2"'
@@ -974,20 +1101,94 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [120, 124.0]
+    coordinate: [56, 120.0]
+    rotation: 0
+    state: disabled
+- name: zeromq_pub_msg_sink_0
+  id: zeromq_pub_msg_sink
+  parameters:
+    address: tcp://127.0.0.1:5557
+    affinity: ''
+    alias: ''
+    bind: 'True'
+    comment: ''
+    timeout: '100'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [776, 176.0]
+    rotation: 0
+    state: enabled
+- name: zeromq_pub_msg_sink_1
+  id: zeromq_pub_msg_sink
+  parameters:
+    address: ''
+    affinity: ''
+    alias: ''
+    bind: 'True'
+    comment: ''
+    timeout: '100'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 144.0]
+    rotation: 0
+    state: disabled
+- name: zeromq_pub_msg_sink_2
+  id: zeromq_pub_msg_sink
+  parameters:
+    address: tcp://127.0.0.1:5556
+    affinity: ''
+    alias: ''
+    bind: 'True'
+    comment: ''
+    timeout: '100'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [504, 352.0]
+    rotation: 0
+    state: disabled
+- name: zeromq_sub_msg_source_0
+  id: zeromq_sub_msg_source
+  parameters:
+    address: tcp://127.0.0.1:5556
+    affinity: ''
+    alias: ''
+    bind: 'False'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    timeout: '100'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [56, 696.0]
     rotation: 0
     state: enabled
 
 connections:
 - [blocks_file_source_0, '0', digital_gfsk_mod_0, '0']
+- [blocks_file_source_0_0, '0', blocks_message_strobe_0, set_msg]
+- [blocks_message_strobe_0, strobe, zeromq_pub_msg_sink_2, in]
 - [digital_gfsk_mod_0, '0', rational_resampler_xxx_1, '0']
 - [pdu_pdu_to_stream_x_0, '0', blocks_file_sink_0, '0']
+- [pdu_pdu_to_stream_x_1, '0', digital_gfsk_mod_0, '0']
+- [rational_resampler_xxx_1, '0', soapy_hackrf_sink_0, '0']
 - [rational_resampler_xxx_1, '0', uhd_usrp_sink_0, '0']
 - [satellites_satellite_decoder_0, out, blocks_message_debug_0, print_pdu]
 - [satellites_satellite_decoder_0, out, network_socket_pdu_0, pdus]
 - [satellites_satellite_decoder_0, out, pdu_pdu_to_stream_x_0, pdus]
+- [satellites_satellite_decoder_0, out, zeromq_pub_msg_sink_0, in]
+- [soapy_hackrf_source_0, '0', satellites_satellite_decoder_0, '0']
 - [uhd_usrp_sink_0, async_msgs, blocks_message_debug_0_0, print]
 - [uhd_usrp_source_0, '0', satellites_satellite_decoder_0, '0']
+- [zeromq_sub_msg_source_0, out, blocks_message_debug_0_0_0, print_pdu]
+- [zeromq_sub_msg_source_0, out, pdu_pdu_to_stream_x_1, pdus]
 
 metadata:
   file_format: 1

@@ -6,43 +6,30 @@
 #
 # GNU Radio Python Flow Graph
 # Title: Groundstation Transmit
-# GNU Radio version: 3.10.1.1
-
-from packaging.version import Version as StrictVersion
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print("Warning: failed to XInitThreads()")
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
-from gnuradio.filter import firdes
-import sip
+from PyQt5 import QtCore
 from gnuradio import blocks
 import pmt
+from gnuradio import blocks, gr
 from gnuradio import digital
 from gnuradio import filter
+from gnuradio.filter import firdes
 from gnuradio import gr
 from gnuradio.fft import window
 import sys
 import signal
+from PyQt5 import Qt
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import uhd
 import time
-from gnuradio.qtgui import Range, RangeWidget
-from PyQt5 import QtCore
+import sip
 
 
-
-from gnuradio import qtgui
 
 class sat_tx(gr.top_block, Qt.QWidget):
 
@@ -53,8 +40,8 @@ class sat_tx(gr.top_block, Qt.QWidget):
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
         self.top_scroll_layout = Qt.QVBoxLayout()
         self.setLayout(self.top_scroll_layout)
         self.top_scroll = Qt.QScrollArea()
@@ -70,12 +57,11 @@ class sat_tx(gr.top_block, Qt.QWidget):
         self.settings = Qt.QSettings("GNU Radio", "sat_tx")
 
         try:
-            if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-                self.restoreGeometry(self.settings.value("geometry").toByteArray())
-            else:
-                self.restoreGeometry(self.settings.value("geometry"))
-        except:
-            pass
+            geometry = self.settings.value("geometry")
+            if geometry:
+                self.restoreGeometry(geometry)
+        except BaseException as exc:
+            print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
 
         ##################################################
         # Variables
@@ -84,7 +70,7 @@ class sat_tx(gr.top_block, Qt.QWidget):
         self.interpolation = interpolation = 6
         self.decimation = decimation = 1
         self.variable_qtgui_range_1 = variable_qtgui_range_1 = 40
-        self.samp_rate = samp_rate = 240000
+        self.samp_rate = samp_rate = 1000000
         self.samp_per_symbol = samp_per_symbol = 2
         self.baud = baud = 9600
         self.TX_samp_rate = TX_samp_rate = int(iq_file_samp_rate * interpolation / decimation)
@@ -93,8 +79,9 @@ class sat_tx(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self._variable_qtgui_range_1_range = Range(0, 32000, 1, 40, 200)
-        self._variable_qtgui_range_1_win = RangeWidget(self._variable_qtgui_range_1_range, self.set_variable_qtgui_range_1, "'variable_qtgui_range_1'", "counter_slider", int, QtCore.Qt.Horizontal)
+
+        self._variable_qtgui_range_1_range = qtgui.Range(0, 32000, 1, 40, 200)
+        self._variable_qtgui_range_1_win = qtgui.RangeWidget(self._variable_qtgui_range_1_range, self.set_variable_qtgui_range_1, "'variable_qtgui_range_1'", "counter_slider", int, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._variable_qtgui_range_1_win)
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
             ",".join(("", '')),
@@ -110,7 +97,7 @@ class sat_tx(gr.top_block, Qt.QWidget):
 
         self.uhd_usrp_sink_0.set_center_freq(RF_Center_Freq, 0)
         self.uhd_usrp_sink_0.set_antenna("TX/RX", 0)
-        self.uhd_usrp_sink_0.set_gain(0, 0)
+        self.uhd_usrp_sink_0.set_gain(30, 0)
         self.rational_resampler_xxx_1 = filter.rational_resampler_ccc(
                 interpolation=240385,
                 decimation=19200,
@@ -192,8 +179,8 @@ class sat_tx(gr.top_block, Qt.QWidget):
             verbose=False,
             log=False,
             do_unpack=True)
-        self.blocks_message_debug_0 = blocks.message_debug(True)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/cysat-radio/Desktop/CloneComm/Newly_Generated_CySat_Packet_For_Uplink', True, 0, 0)
+        self.blocks_message_debug_0 = blocks.message_debug(True, gr.log_levels.info)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/groundstation/CloneComm/Newly_Generated_CySat_Packet_For_Uplink.bin', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
 
 
@@ -281,9 +268,6 @@ class sat_tx(gr.top_block, Qt.QWidget):
 
 def main(top_block_cls=sat_tx, options=None):
 
-    if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
-        style = gr.prefs().get_string('qtgui', 'style', 'raster')
-        Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()

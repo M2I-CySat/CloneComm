@@ -1,0 +1,153 @@
+oct 3 19:34 2024
+
+somerason I got errors and con't run it.
+
+I changed out sat_downlink_uplink_fall2024 's id property from sat_downlink_uplink to  sat_downlink_uplink_fall2024
+so it compliment to python as sat_downlink_uplink_fall2024 .py  and does overwirte the  sat_downlink_uplink.py
+
+still didn't run still and turn out every .grc is unable to run 
+  File "/home/groundstation/CloneComm/GNU Radio Files/sat_downlink_uplink_fall2024.py", line 79, in __init__
+    self.uhd_usrp_sink_0 = uhd.usrp_sink(
+                           ^^^^^^^^^^^^^^
+RuntimeError: LookupError: KeyError: No devices found for ----->
+Device Address:
+    master_clock_rate: 120e6
+
+
+so then I looked at the form:
+https://forums.ni.com/t5/USRP-Software-Radio/How-to-set-up-and-test-an-Ettus-USRP-N200-using-Windows-10-or-11/td-p/4352541
+
+turn out our USRP N200 isn't even bing detected so I went to Ettus Research website to see weather I can detected:
+https://kb.ettus.com/Verifying_the_Operation_of_the_USRP_Using_UHD_and_GNU_Radio
+
+turn the USRP N200 wasn't even being detected from the begining(John and I where working on it)
+because we runing "uhd_usrp_probe" it should give no  errors accoring to the Ettus Research's website but it give us
+uhd_usrp_probe 
+[WARNING] Unable to scan ip: -19
+
+[WARNING] [UHDSoapyDevice] Unable to scan ip: -19
+
+  _____________________________________________________
+ /
+|       Device: Audio
+|     _____________________________________________________
+|    /
+|   |       Mboard: Audio
+|   |   device_id: 0
+|   |   origin: https://github.com/pothosware/SoapyAudio
+|   |   
+|   |   Time sources:  
+|   |   Clock sources: 
+|   |   Sensors: 
+|   |     _____________________________________________________
+|   |    /
+|   |   |       RX DSP: 0
+|   |   |   
+|   |   |   Freq range: 0.000 to 0.000 MHz
+|   |     _____________________________________________________
+|   |    /
+|   |   |       RX Dboard: 0
+|   |   |     _____________________________________________________
+|   |   |    /
+|   |   |   |       RX Frontend: 0
+|   |   |   |   Name: SoapyRF
+|   |   |   |   Antennas: RX
+|   |   |   |   Sensors: 
+|   |   |   |   Freq range: 0.000 to 6000.000 MHz
+|   |   |   |   Gain Elements: None
+|   |   |   |   Bandwidth range: 0.0 to 0.0 step 0.0 Hz
+|   |   |   |   Connection Type: IQ
+|   |   |   |   Uses LO offset: No
+|   |   |     _____________________________________________________
+|   |   |    /
+|   |   |   |       RX Codec: 0
+|   |   |   |   Name: SoapyADC
+|   |   |   |   Gain Elements: None
+|   |     _____________________________________________________
+|   |    /
+|   |   |       TX DSP: 0
+|   |   |   
+|   |   |   Freq range: 0.000 to 0.000 MHz
+|   |     _____________________________________________________
+|   |    /
+|   |   |       TX Dboard: 0
+|   |   |     _____________________________________________________
+|   |   |    /
+|   |   |   |       TX Frontend: 0
+|   |   |   |   Name: None
+|   |   |   |   Antennas: 
+|   |   |   |   Sensors: 
+|   |   |   |   Freq range: 0.000 to 0.000 MHz
+|   |   |   |   Gain Elements: None
+|   |   |   |   Bandwidth range: 0.0 to 0.0 step 0.0 Hz
+|   |   |   |   Connection Type: IQ
+|   |   |   |   Uses LO offset: No
+|   |   |     _____________________________________________________
+|   |   |    /
+|   |   |   |       TX Codec: 0
+|   |   |   |   Name: None
+|   |   |   |   Gain Elements: None
+
+the "[WARNING] Unable to scan ip: -19" is the ame waring we got before when runing the file on gruradio 
+and it seems to be only depecting the audio device even when the USRP is connected 
+
+the tryed the commad "uhd_find_devices" for the Ettus Research website whihc list the all the devicess and got:
+uhd_find_devices
+evice Address:
+    serial: 1119041586445599060
+    default_input: False
+    default_output: False
+    device_id: 1
+    driver: audio
+    label: GP107GL High Definition Audio Controller
+    type: soapy
+
+
+--------------------------------------------------
+-- UHD Device 1
+--------------------------------------------------
+Device Address:
+    serial: 114586438405978704
+    default_input: False
+    default_output: True
+    device_id: 0
+    driver: audio
+    label: Built-in Audio
+    type: soapy
+
+as you can see form the label there's no indication of the USRP N200 being connected
+on the Ettus's website the output ahow have one device that looks like this if every connect right:
+$ uhd_find_devices 
+linux; GNU C++ version 4.8.4; Boost_105400; UHD_003.010.000.HEAD-0-g6e1ac3fc
+
+--------------------------------------------------
+-- UHD Device 0
+--------------------------------------------------
+Device Address:
+    type: usrp2
+    addr: 192.168.10.2
+    name: 
+    serial: xxxxxx
+
+
+during all of these commnad I had the USRP N200 powered on and connected via ethernet to the computer derictly.
+right now the File under GNU Ragio Files can't run but have the same error we sitll have a version from CloneComm/GNU Radio Files/ github 
+
+
+*************OCT 4 16:26 2024***********************
+
+[4] https://kb.ettus.com/Building_and_Installing_the_USRP_Open-Source_Toolchain_(UHD_and_GNU_Radio)_on_Linux
+ in website [4]  go to ethernet connfi then go the wired connectiion under network in setting of this computer and go to IP$ aand set to manual and enter the following:
+
+ Adress:  192.168.10.1
+ Netmask: 255.255.255.0
+ Gateway: 192.168.10.2
+ 
+
+foundout on 
+[1] https://dev.to/dansyuqri/pub-sub-with-pyzmq-part-1-2f63 
+we have to use bind instead of connect
+so not this X X X X:
+            socket_tx.connect("tcp://"+ip+":"+txport)
+but this: 
+            socket_tx.bind("tcp://"+ip+":"+txport)

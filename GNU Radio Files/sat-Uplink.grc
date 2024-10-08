@@ -121,7 +121,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '240000'
+    value: '1000000'
   states:
     bus_sink: false
     bus_source: false
@@ -157,7 +157,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /home/cysat-radio/Desktop/CloneComm/Newly_Generated_CySat_Packet_For_Uplink
+    file: /home/groundstation/CloneComm/Newly_Generated_CySat_Packet_For_Uplink.bin
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -179,6 +179,7 @@ blocks:
     alias: ''
     comment: ''
     en_uvec: 'True'
+    log_level: info
   states:
     bus_sink: false
     bus_source: false
@@ -353,6 +354,26 @@ blocks:
     coordinate: [504, 292.0]
     rotation: 0
     state: true
+- name: soapy_hackrf_sink_0
+  id: soapy_hackrf_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: 'False'
+    bandwidth: '0'
+    center_freq: RF_Center_Freq
+    comment: ''
+    dev_args: ''
+    samp_rate: samp_rate
+    type: fc32
+    vga: '47'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [816, 424.0]
+    rotation: 0
+    state: disabled
 - name: uhd_usrp_sink_0
   id: uhd_usrp_sink
   parameters:
@@ -466,7 +487,7 @@ blocks:
     comment: ''
     dev_addr: '""'
     dev_args: ''
-    gain0: '0'
+    gain0: '30'
     gain1: '0'
     gain10: '0'
     gain11: '0'
@@ -636,8 +657,10 @@ connections:
 - [digital_gfsk_mod_0, '0', qtgui_sink_x_0, '0']
 - [digital_gfsk_mod_0, '0', qtgui_time_sink_x_0, '0']
 - [digital_gfsk_mod_0, '0', rational_resampler_xxx_1, '0']
+- [rational_resampler_xxx_1, '0', soapy_hackrf_sink_0, '0']
 - [rational_resampler_xxx_1, '0', uhd_usrp_sink_0, '0']
 - [uhd_usrp_sink_0, async_msgs, blocks_message_debug_0, print]
 
 metadata:
   file_format: 1
+  grc_version: 3.10.10.0

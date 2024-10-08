@@ -162,14 +162,14 @@ def connect(ip,txport,rxport,connectedvar):
         try:
             context_tx = zmq.Context()
             socket_tx = context_tx.socket(zmq.PUB)
-            socket_tx.connect("tcp://"+ip+":"+txport)
+            socket_tx.bind("tcp://"+ip+":"+txport) ## changing this to from connect to bind 
             context_rx = zmq.Context()
             socket_rx = context_rx.socket(zmq.SUB)
             socket_rx.connect("tcp://"+ip+":"+rxport)
             socket_rx.subscribe("")
-            connected = True
             log_output("Connected to server")
             start_reception(connectedvar)
+            connected = True
         except:
             log_output("Error connecting to server")
             connected = False
@@ -365,8 +365,11 @@ def uplink(message):
     print("Attempting to uplink message")
     global socket_tx
     message_length = len(message)
-    print(int(message_length))
-    #print(message)
+    print("seeme!!!!!!!!!!!!!!")
+    print("Size of the message in bytes: ",int(message_length))
+    print("The message in hex: \n",message.hex())
+    print("The message is sent in bytes")
+
     pdu = pmt.cons(pmt.PMT_NIL,pmt.init_u8vector(message_length,(message)))
     try:
         socket_tx.send(pmt.serialize_str(pdu))
@@ -439,6 +442,7 @@ def main():
     # b1 = qt.QPushButton("Ping Satellite")
     # b1.clicked.connect(lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True))) # Done
     # commandlayout.addWidget(b1,1,1)
+   # print(cspp.makeCySatPacket("OBC","01",[], True, True, True) , "< ===debug messge")
     button(obccomlayout,"Ping Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","01",[], True, True, True)),1,1)
     button(obccomlayout,"Request File List",lambda: uplink(cspp.makeCySatPacket("OBC","13",[], True, True, True)),1,2)
     button(obccomlayout,"Restart Satellite",lambda: uplink(cspp.makeCySatPacket("OBC","15",[], True, True, True)),1,3)
